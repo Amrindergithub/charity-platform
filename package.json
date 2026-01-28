@@ -1,0 +1,35 @@
+{
+  "name": "charity-platform",
+  "version": "2.0.0",
+  "description": "TrustChain - Decentralised Charity Platform with DAO Governance",
+  "main": "backend/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node backend/index.js",
+    "dev": "nodemon backend/index.js",
+    "compile": "truffle compile",
+    "deploy": "truffle migrate --network ganache --reset",
+    "console": "truffle console --network ganache",
+    "test": "truffle test --network ganache",
+    "deploy:polygon": "truffle migrate --network polygon_amoy --reset"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "ethers": "^6.16.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.3.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.0.3",
+    "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "truffle": "^5.11.5"
+  }
+}

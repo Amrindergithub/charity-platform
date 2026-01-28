@@ -1,0 +1,14 @@
+node_modules/
+frontend/build/
+frontend/node_modules/
+.env
+frontend/.env
+.DS_Store
+*.log
+frontend/public/uploads/*.jpg
+frontend/public/uploads/*.png
+frontend/public/uploads/*.webp
+CLAUDE.md
+.agent/
+.claude/
+CLAUDE.md
