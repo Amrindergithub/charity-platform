@@ -1,0 +1,280 @@
+/* ========================================
+   Footer — Solar Nocturne
+   ======================================== */
+
+.footer {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin-top: 80px;
+  position: relative;
+}
+
+.dividerLine {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 181, 154, 0.15) 20%,
+    rgba(255, 92, 0, 0.25) 50%,
+    rgba(255, 181, 154, 0.15) 80%,
+    transparent 100%
+  );
+}
+
+/* ---- Main Grid ---- */
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 32px 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+}
+
+/* ---- Brand Column ---- */
+
+.brandColumn {
+  padding-right: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.brandName {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sn-primary, #FFB59A);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.description {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  margin: 0;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.7;
+}
+
+.techStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.techBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--sn-surface, #131313);
+  font-family: 'Inter', monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.techBadge:hover {
+  opacity: 1;
+  border-color: var(--sn-primary, #FFB59A);
+  color: var(--sn-primary, #FFB59A);
+}
+
+/* ---- Column Titles ---- */
+
+.columnTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--sn-on-surface, #E5E2E1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(91, 65, 55, 0.3);
+}
+
+/* ---- Links ---- */
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.6;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--sn-primary, #FFB59A);
+  opacity: 1;
+}
+
+/* ---- Process Steps ---- */
+
+.processList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.processItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  opacity: 0.6;
+}
+
+.processStep {
+  color: var(--sn-primary-container, #FF5C00);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  min-width: 22px;
+}
+
+/* ---- Research ---- */
+
+.researchList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.researchItem {
+  opacity: 0.6;
+}
+
+.researchItemTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.6875rem;
+}
+
+.researchItemTitle.trust {
+  color: var(--sn-primary, #FFB59A);
+}
+
+.researchItemTitle.donor {
+  color: var(--sn-secondary, #FFB955);
+}
+
+.researchItemTitle.polygon {
+  color: #a78bfa;
+}
+
+/* ---- Bottom Bar ---- */
+
+.bottomBar {
+  border-top: 1px solid rgba(91, 65, 55, 0.2);
+  padding: 20px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.copyright {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.4;
+}
+
+.bottomBadges {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgePolygon {
+  background: rgba(167, 139, 250, 0.08);
+  color: #c4b5fd;
+  border: 1px solid rgba(167, 139, 250, 0.15);
+}
+
+.badgeChain {
+  background: rgba(255, 181, 154, 0.08);
+  color: var(--sn-primary, #FFB59A);
+  border: 1px solid rgba(255, 181, 154, 0.15);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px 20px 24px 20px;
+  }
+
+  .brandColumn {
+    padding-right: 0;
+  }
+
+  .bottomBar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 20px;
+  }
+
+  .bottomBadges {
+    flex-wrap: wrap;
+  }
+}

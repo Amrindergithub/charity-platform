@@ -1,0 +1,328 @@
+/* ========================================
+   Navbar — Solar Nocturne
+   ======================================== */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 181, 154, 0.06);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+  transition: background 0.3s ease;
+}
+
+/* ---- Brand ---- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brandText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sn-primary, #FFB59A);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.networkDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.networkOnline {
+  background: #34d399;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+}
+
+.networkOffline {
+  background: var(--sn-error, #FFB4AB);
+  box-shadow: 0 0 6px rgba(255, 180, 171, 0.5);
+}
+
+/* ---- Nav Links ---- */
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navItem {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--sn-on-surface, #E5E2E1);
+  opacity: 0.7;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.navItem:hover {
+  color: var(--sn-primary, #FFB59A);
+  opacity: 1;
+}
+
+.navItemActive {
+  color: var(--sn-primary-container, #FF5C00);
+  opacity: 1;
+  border-bottom-color: var(--sn-primary-container, #FF5C00);
+}
+
+/* ---- CTA Pill ---- */
+
+.primaryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--sn-primary-container, #FF5C00);
+  color: #050505;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-left: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryPill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(255, 92, 0, 0.3);
+}
+
+/* ---- User Area ---- */
+
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 14px;
+  margin-left: 8px;
+  border-left: 1px solid rgba(255, 181, 154, 0.1);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid rgba(255, 180, 171, 0.2);
+  border-radius: 8px;
+  color: var(--sn-error, #FFB4AB);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 180, 171, 0.08);
+  border-color: rgba(255, 180, 171, 0.4);
+}
+
+.userInfo {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 181, 154, 0.2);
+  background: var(--sn-surface-container, #201F1F);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sn-primary, #FFB59A);
+  transition: border-color 0.2s ease;
+}
+
+.avatar:hover {
+  border-color: rgba(255, 181, 154, 0.5);
+}
+
+.walletPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sn-surface, #131313);
+  border: 1px solid rgba(255, 181, 154, 0.08);
+  border-radius: 999px;
+  padding: 5px 12px 5px 6px;
+}
+
+.roleBadge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.roleDonor {
+  background: rgba(255, 181, 154, 0.1);
+  color: var(--sn-primary, #FFB59A);
+}
+
+.roleCharity {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+}
+
+.walletAddress {
+  font-family: 'Inter', monospace;
+  font-size: 0.6875rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.7;
+}
+
+/* ---- Hamburger ---- */
+
+.hamburgerBtn {
+  display: none;
+  background: transparent;
+  border: 1px solid rgba(255, 181, 154, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 10px;
+  transition: border-color 0.2s ease;
+}
+
+.hamburgerBtn:hover {
+  border-color: rgba(255, 181, 154, 0.3);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--sn-on-surface, #E5E2E1);
+  margin: 4px 0;
+  border-radius: 1px;
+  transition: all 0.25s ease;
+}
+
+/* ---- Mobile ---- */
+
+@media (max-width: 1024px) {
+  .navLinks {
+    display: none;
+  }
+
+  .navLinks.navLinksOpen {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border-bottom: 1px solid rgba(255, 181, 154, 0.06);
+    padding: 16px 20px;
+    gap: 8px;
+  }
+
+  .navLinksOpen .navGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navLinksOpen .navItem {
+    padding: 12px 16px;
+    border-bottom: none;
+    border-left: 2px solid transparent;
+    border-radius: 0;
+  }
+
+  .navLinksOpen .navItemActive {
+    border-bottom-color: transparent;
+    border-left-color: var(--sn-primary-container, #FF5C00);
+    background: rgba(255, 92, 0, 0.05);
+  }
+
+  .navLinksOpen .primaryPill {
+    margin-left: 0;
+    margin-top: 8px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .navLinksOpen .userArea {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .navLinksOpen .userSection {
+    border-left: none;
+    margin-left: 0;
+    padding-left: 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 181, 154, 0.06);
+    flex-wrap: wrap;
+  }
+
+  .hamburgerBtn {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    height: 64px;
+    padding: 0 16px;
+  }
+
+  .navLinks.navLinksOpen {
+    top: 64px;
+  }
+
+  .brandText {
+    font-size: 1rem;
+  }
+}
