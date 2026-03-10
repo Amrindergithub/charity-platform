@@ -1,0 +1,437 @@
+/* ── Profile — Solar Nocturne ── */
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 4fr 8fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Left Column: User Card ── */
+.userCard {
+  position: relative;
+  background: var(--sn-surface-lowest, #0E0E0E);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(255, 92, 0, 0.06);
+}
+
+.userCardOrb {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 92, 0, 0.04);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.avatarLarge {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 92, 0, 0.12), rgba(255, 92, 0, 0.04));
+  border: 2px solid rgba(255, 92, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--sn-primary, #FFB59A);
+  margin: 0 auto 20px;
+  text-transform: uppercase;
+}
+
+.avatarCharity {
+  background: linear-gradient(135deg, rgba(255, 185, 85, 0.12), rgba(255, 185, 85, 0.04));
+  border-color: rgba(255, 185, 85, 0.3);
+  color: var(--sn-secondary, #FFB955);
+}
+
+.userName {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.userRole {
+  font-size: 0.8125rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 0 0 16px;
+}
+
+.tierBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 92, 0, 0.08);
+  border: 1px solid rgba(255, 92, 0, 0.2);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--sn-primary, #FFB59A);
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tierDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sn-primary-container, #FF5C00);
+  animation: tierPulse 2s ease-in-out infinite;
+}
+
+@keyframes tierPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.walletRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid rgba(91, 65, 55, 0.3);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+}
+
+.walletAddr {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.walletCopyBtn {
+  background: transparent;
+  border: none;
+  color: var(--sn-primary, #FFB59A);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+
+.walletCopyBtn:hover {
+  opacity: 0.7;
+}
+
+.memberSince {
+  font-size: 0.75rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* ── Account Stats Bento ── */
+.statsBento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.statBox {
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid rgba(91, 65, 55, 0.3);
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.statBoxIcon {
+  font-size: 1.25rem;
+  color: var(--sn-primary, #FFB59A);
+  margin-bottom: 6px;
+}
+
+.statBoxValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0;
+}
+
+.statBoxLabel {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.6;
+  margin: 4px 0 0;
+}
+
+/* ── Right Column ── */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sectionHeader {
+  margin-bottom: 4px;
+}
+
+.sectionTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.sectionDesc {
+  font-size: 0.875rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 0;
+}
+
+/* ── Section Cards ── */
+.card {
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cardIcon {
+  font-size: 1.25rem;
+  color: var(--sn-primary, #FFB59A);
+}
+
+.cardTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Form Styles ── */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGridFull {
+  grid-column: 1 / -1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.7;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sn-outline-variant, #5B4137);
+  color: var(--sn-on-surface, #E5E2E1);
+  padding: 10px 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--sn-primary, #FFB59A);
+}
+
+.input::placeholder {
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.4;
+}
+
+.inputReadonly {
+  composes: input;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.textarea {
+  composes: input;
+  resize: vertical;
+  min-height: 80px;
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.textarea:focus {
+  border-color: var(--sn-primary, #FFB59A);
+}
+
+/* ── Toggle Switch ── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(91, 65, 55, 0.25);
+}
+
+.toggleRow:last-child {
+  border-bottom: none;
+}
+
+.toggleLabel {
+  font-size: 0.875rem;
+  color: var(--sn-on-surface, #E5E2E1);
+  font-weight: 500;
+}
+
+.toggleTrack {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--sn-surface-high, #2A2A2A);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.toggleTrackOn {
+  composes: toggleTrack;
+  background: var(--sn-primary-container, #FF5C00);
+  border-color: var(--sn-primary-container, #FF5C00);
+}
+
+.toggleThumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sn-on-surface, #E5E2E1);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+}
+
+.toggleThumbOn {
+  composes: toggleThumb;
+  transform: translateX(20px);
+}
+
+/* ── Action Footer ── */
+.actionFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  padding-top: 8px;
+}
+
+.discardLink {
+  background: none;
+  border: none;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition: color 0.2s;
+}
+
+.discardLink:hover {
+  color: var(--sn-error, #FFB4AB);
+}
+
+.primaryBtn {
+  background: var(--sn-primary-container, #FF5C00);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.primaryBtn:hover {
+  opacity: 0.85;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  composes: primaryBtn;
+  background: var(--sn-surface-high, #2A2A2A);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+}
+
+.secondaryBtn:hover {
+  border-color: var(--sn-primary, #FFB59A);
+}

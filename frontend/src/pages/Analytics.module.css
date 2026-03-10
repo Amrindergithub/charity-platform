@@ -1,0 +1,353 @@
+/* ── Solar Nocturne: Impact Analytics ── */
+
+/* ── Container ── */
+.container {
+  padding: 80px 24px 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Page Header ── */
+.pageHeader {
+  margin-bottom: 48px;
+}
+
+.pageTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--sn-on-surface, #E5E2E1);
+  line-height: 0.95;
+  margin-bottom: 16px;
+}
+
+.pageSubtitle {
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  font-size: 1rem;
+  max-width: 600px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ── Metrics Grid ── */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 1024px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metricCard {
+  background: var(--sn-surface-lowest, #0E0E0E);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  animation: solarGlow 6s ease-in-out infinite;
+}
+
+.metricCard:hover {
+  border-color: var(--sn-primary, #FFB59A);
+  box-shadow: 0 0 40px -10px rgba(255, 92, 0, 0.15);
+}
+
+@keyframes solarGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 0, 0); }
+  50% { box-shadow: 0 0 30px -8px rgba(255, 92, 0, 0.06); }
+}
+
+.metricLabel {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+}
+
+.metricIcon {
+  font-size: 18px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.6;
+}
+
+.metricValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--sn-primary, #FFB59A);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.metricTrend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.trendUp {
+  color: #4ade80;
+}
+
+.trendDown {
+  color: #f87171;
+}
+
+.trendNeutral {
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.5;
+}
+
+/* ── Charts Layout ── */
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 900px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartPanel {
+  background: var(--sn-surface-lowest, #0E0E0E);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.chartIcon {
+  font-size: 18px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+}
+
+.chartTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--sn-on-surface, #E5E2E1);
+  font-weight: 600;
+}
+
+.chartDesc {
+  font-size: 12px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* ── Pie Legend ── */
+.pieLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Spending Section ── */
+.spendingSection {
+  margin-bottom: 48px;
+}
+
+.spendingLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .spendingLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--sn-surface-high, #2A2A2A);
+}
+
+.categoryItem:last-child {
+  border-bottom: none;
+}
+
+.categoryDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoryInfo {
+  flex: 1;
+}
+
+.categoryName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sn-on-surface, #E5E2E1);
+}
+
+.categoryCount {
+  font-size: 11px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.5;
+}
+
+.categoryValues {
+  text-align: right;
+}
+
+.categoryAmount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.categoryPercent {
+  font-size: 10px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.5;
+}
+
+/* ── Bar Chart Section ── */
+.barSection {
+  margin-bottom: 48px;
+}
+
+/* ── Research Section ── */
+.researchPanel {
+  background: var(--sn-surface-lowest, #0E0E0E);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+
+.researchTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--sn-on-surface, #E5E2E1);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.researchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.researchItem {
+  font-size: 13px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  line-height: 1.8;
+  opacity: 0.8;
+}
+
+.researchHighlight {
+  font-weight: 600;
+  color: var(--sn-primary, #FFB59A);
+}
+
+.researchHighlightSecondary {
+  font-weight: 600;
+  color: var(--sn-secondary, #FFB955);
+}
+
+.researchHighlightAccent {
+  font-weight: 600;
+  color: var(--sn-primary-container, #FF5C00);
+}
+
+/* ── Recharts tooltip override ── */
+.tooltipStyle {
+  background: var(--sn-surface-lowest, #0E0E0E) !important;
+  border: 1px solid var(--sn-outline-variant, #5B4137) !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  color: var(--sn-on-surface, #E5E2E1) !important;
+}
+
+/* ── Section Header ── */
+.sectionHeader {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--sn-on-surface, #E5E2E1);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.sectionDesc {
+  font-size: 12px;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.5;
+}

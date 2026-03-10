@@ -1,0 +1,417 @@
+/* ── MyDonations — Solar Nocturne ── */
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Hero Stat Panel ── */
+.heroPanel {
+  position: relative;
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 20px;
+  padding: 48px 40px;
+  margin-bottom: 48px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(255, 92, 0, 0.06);
+}
+
+.pulseOrb {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(255, 92, 0, 0.05);
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.heroMain {
+  flex: 1;
+  min-width: 280px;
+}
+
+.heroLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 0 0 8px;
+}
+
+.heroValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0;
+}
+
+.heroUnit {
+  color: var(--sn-primary-container, #FF5C00);
+}
+
+.heroDesc {
+  font-size: 0.875rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 12px 0 0;
+  max-width: 400px;
+}
+
+.heroSide {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.heroMiniCard {
+  background: var(--sn-surface, #131313);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 14px;
+  padding: 20px 24px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.miniLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 0 0 6px;
+}
+
+.miniValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0;
+}
+
+/* ── Section Title ── */
+.sectionTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 6px;
+}
+
+.sectionUnderline {
+  height: 2px;
+  width: 120px;
+  background: linear-gradient(to right, var(--sn-primary, #FFB59A), transparent);
+  margin-bottom: 28px;
+  border: none;
+}
+
+/* ── Portfolio Grid ── */
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .portfolioGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolioGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Card ── */
+.card {
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.cardImageWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--sn-surface-high, #2A2A2A);
+  overflow: hidden;
+}
+
+.cardImageBg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--sn-surface-high, #2A2A2A), var(--sn-surface, #131313));
+}
+
+.cardImageIcon {
+  font-size: 2rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.4;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2), transparent);
+  pointer-events: none;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.badgeVerified {
+  background: var(--sn-secondary, #FFB955);
+  color: var(--sn-bg, #050505);
+}
+
+.badgeLegacy {
+  background: var(--sn-primary-container, #FF5C00);
+  color: #fff;
+}
+
+.badgePending {
+  background: var(--sn-surface-highest, #353534);
+  color: var(--sn-on-surface-variant, #E4BEB1);
+}
+
+.cardBody {
+  padding: 20px;
+}
+
+.cardTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 4px;
+  text-decoration: none;
+  display: block;
+  transition: color 0.2s;
+}
+
+.cardTitle:hover {
+  color: var(--sn-primary, #FFB59A);
+}
+
+.cardMeta {
+  font-size: 0.6875rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  opacity: 0.7;
+  margin: 0 0 14px;
+  font-family: monospace;
+}
+
+.cardAmount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 16px;
+}
+
+.cardAmountUnit {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--sn-primary, #FFB59A);
+  margin-left: 4px;
+}
+
+.receiptBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.receiptBtn:hover {
+  border-color: var(--sn-primary, #FFB59A);
+  color: var(--sn-primary, #FFB59A);
+  background: rgba(255, 181, 154, 0.06);
+}
+
+.receiptIcon {
+  font-size: 1.125rem;
+}
+
+/* ── Empty State ── */
+.emptyState {
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--sn-surface-high, #2A2A2A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 1.5rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+}
+
+.emptyTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 0 0 8px;
+}
+
+.emptyDesc {
+  font-size: 0.875rem;
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  margin: 0 0 24px;
+}
+
+.emptyBtn {
+  display: inline-block;
+  background: var(--sn-primary-container, #FF5C00);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.emptyBtn:hover {
+  opacity: 0.85;
+}
+
+/* ── Login Prompt ── */
+.loginPrompt {
+  text-align: center;
+  padding: 100px 24px;
+}
+
+.loginTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sn-on-surface, #E5E2E1);
+  margin: 16px 0 8px;
+}
+
+.loginDesc {
+  color: var(--sn-on-surface-variant, #E4BEB1);
+  font-size: 0.875rem;
+  margin: 0 0 24px;
+}
+
+.loginBtn {
+  display: inline-block;
+  background: var(--sn-primary-container, #FF5C00);
+  color: #fff;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.loginBtn:hover {
+  opacity: 0.85;
+}
+
+/* ── Loading Skeleton ── */
+.skelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .skelGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .skelGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skelCard {
+  background: var(--sn-surface-low, #1C1B1B);
+  border: 1px solid var(--sn-outline-variant, #5B4137);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.skelImage {
+  aspect-ratio: 16 / 9;
+  background: var(--sn-surface-high, #2A2A2A);
+}
+
+.skelBody {
+  padding: 20px;
+}
+
+.skelLine {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--sn-surface-high, #2A2A2A);
+  margin-bottom: 10px;
+  animation: skelPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skelPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
