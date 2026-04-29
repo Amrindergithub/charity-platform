@@ -292,6 +292,8 @@ contract CharityPlatform {
         require(!c.cancelled, "Campaign cancelled");
         require(c.deadline == 0 || block.timestamp <= c.deadline, "Campaign deadline passed");
         require(msg.value >= c.minimumContribution, "Donation below minimum");
+        // Issue 21: Reject donations once funding goal is reached
+        require(c.raisedAmount < c.target, "Goal already reached");
 
         _registerDonor(_campaignId);
         c.raisedAmount += msg.value;
@@ -314,7 +316,13 @@ contract CharityPlatform {
         Campaign storage c = campaigns[_campaignId];
         require(!c.cancelled, "Campaign cancelled");
         require(c.deadline == 0 || block.timestamp <= c.deadline, "Deadline passed");
-        require(_amount >= c.minimumContribution, "Below minimum contribution");
+        // Issue 21: Reject donations once ETH-denominated goal is reached
+        // (Stablecoin contributions tracked separately; this guards against runaway donations
+        //  on a campaign that has already met its target in ETH alone.)
+        require(c.raisedAmount < c.target, "Goal already reached");
+        // minimumContribution is in wei (ETH); stablecoins use different decimals (e.g. 6 for USDT)
+        // so we only enforce a non-zero check here
+        require(_amount > 0, "Amount must be greater than 0");
 
         IERC20 token = IERC20(stablecoinAddress);
         require(token.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
