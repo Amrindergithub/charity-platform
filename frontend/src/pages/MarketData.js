@@ -10,7 +10,6 @@ export default function MarketData() {
   const [btcPrice, setBtcPrice] = useState(null);
   const [cryptoPrices, setCryptoPrices] = useState(null);
   const [exchangeRates, setExchangeRates] = useState(null);
-  const [countries, setCountries] = useState(null);
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -25,7 +24,6 @@ export default function MarketData() {
       { key: "btcPrice", endpoint: "/api/btc-price", setter: setBtcPrice },
       { key: "cryptoPrices", endpoint: "/api/crypto-prices", setter: setCryptoPrices },
       { key: "exchangeRates", endpoint: "/api/exchange-rates", setter: setExchangeRates },
-      { key: "countries", endpoint: "/api/countries", setter: setCountries },
       { key: "geoData", endpoint: "/api/geolocate", setter: setGeoData },
     ];
 
@@ -70,7 +68,7 @@ export default function MarketData() {
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.displayTitle}>Market Data</h1>
-          <p className={styles.headerDesc}>Loading live data from 7 public APIs...</p>
+          <p className={styles.headerDesc}>Loading live data from 6 public APIs...</p>
         </div>
         <div className={styles.skelGrid}>
           {[1, 2, 3, 4, 5, 6].map(i => (
@@ -91,7 +89,6 @@ export default function MarketData() {
     { name: "Blockchain.info", bg: "rgba(247,147,26,0.08)", color: "#f7931a", border: "rgba(247,147,26,0.2)" },
     { name: "CryptoCompare", bg: "rgba(123,63,228,0.08)", color: "#7b3fe4", border: "rgba(123,63,228,0.2)" },
     { name: "Frankfurter", bg: "rgba(245,158,11,0.08)", color: "#f59e0b", border: "rgba(245,158,11,0.2)" },
-    { name: "REST Countries", bg: "rgba(16,185,129,0.08)", color: "#10b981", border: "rgba(16,185,129,0.2)" },
     { name: "ip-api.com", bg: "rgba(6,182,212,0.08)", color: "#06b6d4", border: "rgba(6,182,212,0.2)" },
   ];
 
@@ -102,7 +99,7 @@ export default function MarketData() {
       <div className={styles.header}>
         <h1 className={styles.displayTitle}>Market Data</h1>
         <p className={styles.headerDesc}>
-          Live data from 7 public APIs integrated via the{" "}
+          Live data from 6 public APIs integrated via the{" "}
           <a href="https://github.com/Amrindergithub/public-apis" target="_blank" rel="noreferrer" className={styles.headerDescLink}>
             public-apis
           </a>{" "}
@@ -178,17 +175,6 @@ export default function MarketData() {
                   EUR: <strong className={styles.fiatItemValue}>{"\u20AC"}{fmt(ethPrice.eur)}</strong>
                 </span>
               </div>
-              {/* SVG Sparkline */}
-              <svg className={styles.sparkline} viewBox="0 0 200 40" preserveAspectRatio="none" width="100%">
-                <defs>
-                  <linearGradient id="sparkGradEth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FF5C00" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#FF5C00" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M0,30 Q25,28 50,22 T100,18 T150,12 T200,8" fill="none" stroke="#FF5C00" strokeWidth="1.5" />
-                <path d="M0,30 Q25,28 50,22 T100,18 T150,12 T200,8 V40 H0 Z" fill="url(#sparkGradEth)" />
-              </svg>
             </>
           ) : null}
         </div>
@@ -220,16 +206,6 @@ export default function MarketData() {
                   EUR: <strong className={styles.fiatItemValue}>{"\u20AC"}{fmt(btcPrice.eur)}</strong>
                 </span>
               </div>
-              <svg className={styles.sparkline} viewBox="0 0 200 40" preserveAspectRatio="none" width="100%">
-                <defs>
-                  <linearGradient id="sparkGradBtc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FFB955" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#FFB955" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M0,25 Q30,30 60,20 T120,15 T180,22 T200,10" fill="none" stroke="#FFB955" strokeWidth="1.5" />
-                <path d="M0,25 Q30,30 60,20 T120,15 T180,22 T200,10 V40 H0 Z" fill="url(#sparkGradBtc)" />
-              </svg>
             </>
           ) : null}
         </div>
@@ -386,46 +362,11 @@ export default function MarketData() {
         </div>
       </div>
 
-      {/* ── Countries Database ── */}
-      <div className={styles.panel}>
-        <div className={styles.panelHeader}>
-          <h3 className={styles.panelTitle}>Countries Database</h3>
-          <span className={styles.ledgerSourceBadge} style={{ background: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}>
-            REST Countries
-          </span>
-        </div>
-        {errors.countries ? (
-          <div className={styles.errorText}>Failed to load</div>
-        ) : countries ? (
-          <>
-            <div className={styles.countriesCount}>
-              {countries.length} countries loaded -- used for donor registration and campaign geographic targeting
-            </div>
-            <div className={styles.countriesWrap}>
-              {countries
-                .sort((a, b) => (a.name?.common || "").localeCompare(b.name?.common || ""))
-                .slice(0, 60)
-                .map((c, i) => (
-                  <span key={i} className={styles.countryTag}>
-                    {c.flags?.png && <img src={c.flags.png} alt="" className={styles.countryFlag} />}
-                    {c.name?.common || c.cca2}
-                  </span>
-                ))}
-              {countries.length > 60 && (
-                <span className={styles.countriesMore}>
-                  + {countries.length - 60} more
-                </span>
-              )}
-            </div>
-          </>
-        ) : null}
-      </div>
-
       {/* ── API Integration Info ── */}
       <div className={styles.apiInfoPanel}>
         <h3 className={styles.apiInfoTitle}>Public API Integration</h3>
         <p className={styles.apiInfoDesc}>
-          TrustChain integrates <strong>7 free public APIs</strong> from the{" "}
+          TrustChain integrates <strong>6 free public APIs</strong> from the{" "}
           <a href="https://github.com/Amrindergithub/public-apis" target="_blank" rel="noreferrer" className={styles.headerDescLink}>
             public-apis
           </a>{" "}
@@ -439,8 +380,7 @@ export default function MarketData() {
             { api: "Blockchain.info", endpoint: "/api/btc-price", desc: "BTC ticker in multiple fiat currencies", cache: "none" },
             { api: "CryptoCompare", endpoint: "/api/crypto-prices", desc: "Multi-crypto multi-fiat price matrix", cache: "none" },
             { api: "Frankfurter", endpoint: "/api/exchange-rates", desc: "ECB fiat exchange rates (30+ currencies)", cache: "5min" },
-            { api: "REST Countries", endpoint: "/api/countries", desc: "250 countries with names, flags, codes", cache: "none" },
-            { api: "ip-api.com", endpoint: "/api/geolocate", desc: "Visitor geolocation (country, city, ISP)", cache: "none" },
+            { api: "ip-api.com", endpoint: "/api/geolocate", desc: "Auto-detects donor country on each donation for analytics", cache: "none" },
           ].map((item, i) => (
             <div key={i} className={styles.apiInfoItem}>
               <div style={{ flex: 1 }}>

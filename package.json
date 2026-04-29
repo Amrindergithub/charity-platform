@@ -13,7 +13,8 @@
     "deploy": "truffle migrate --network ganache --reset",
     "console": "truffle console --network ganache",
     "test": "truffle test --network ganache",
-    "deploy:polygon": "truffle migrate --network polygon_amoy --reset"
+    "deploy:polygon": "truffle migrate --network polygon_amoy --reset",
+    "deploy:sepolia": "truffle migrate --network sepolia --reset"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

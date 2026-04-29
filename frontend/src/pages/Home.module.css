@@ -206,6 +206,14 @@
   color: var(--color-text);
 }
 
+.tickerUsd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-dim);
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+}
+
 .tickerChange {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -664,6 +672,24 @@
 .progressFillComplete {
   background: var(--color-success);
   box-shadow: 0 0 8px rgba(168, 213, 162, 0.4);
+}
+
+.fiatLine {
+  font-size: 0.6875rem;
+  color: var(--color-text-dim);
+  opacity: 0.65;
+  margin-top: 4px;
+  font-family: var(--font-headline);
+  letter-spacing: 0.02em;
+}
+
+.stableNote {
+  font-size: 0.6875rem;
+  color: var(--color-primary);
+  opacity: 0.8;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-family: var(--font-body);
 }
 
 /* Card footer */

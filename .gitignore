@@ -11,4 +11,7 @@ frontend/public/uploads/*.webp
 CLAUDE.md
 .agent/
 .claude/
-CLAUDE.md
+Documentation/
+~$*
+plans/
+*.plan.md

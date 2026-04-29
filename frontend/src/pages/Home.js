@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
-import { getContract, getSigner, getContractAddr, apiFetch, apiPost, formatEth, API_URL } from "../utils/ethereum";
+import { getContract, getSigner, getContractAddr, apiFetch, apiPost, formatEth, formatTokenAmount, getEthUsdPrice, stablecoinToEth, getEthFiatRates, API_URL } from "../utils/ethereum";
 import { getCampaignStatus } from "../utils/campaignHelpers";
 import { useToast } from "../components/Toast";
 import { SkeletonCard } from "../components/Skeleton";
@@ -36,18 +36,22 @@ export default function Home({ user }) {
   const [platformStats, setPlatformStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tickerData, setTickerData] = useState({ eth: null, btc: null });
+  const [ethUsdPrice, setEthUsdPrice] = useState(null);
+  const [ethFiat, setEthFiat] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCampaigns(); loadPlatformStats();
+    getEthUsdPrice().then(setEthUsdPrice);
+    getEthFiatRates().then(setEthFiat);
     // Try to fetch live ETH/GBP rate
     // Fetch ticker data for ETH + BTC
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=gbp&include_24hr_change=true')
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=gbp,usd&include_24hr_change=true')
       .then(r => r.json())
       .then(data => {
         setTickerData({
-          eth: data?.ethereum ? { price: data.ethereum.gbp, change: data.ethereum.gbp_24h_change } : null,
-          btc: data?.bitcoin ? { price: data.bitcoin.gbp, change: data.bitcoin.gbp_24h_change } : null,
+          eth: data?.ethereum ? { price: data.ethereum.gbp, usd: data.ethereum.usd, change: data.ethereum.usd_24h_change } : null,
+          btc: data?.bitcoin ? { price: data.bitcoin.gbp, usd: data.bitcoin.usd, change: data.bitcoin.usd_24h_change } : null,
         });
       })
       .catch(e => console.warn('Ticker fetch failed:', e.message));
@@ -88,8 +92,9 @@ export default function Home({ user }) {
                 targetRaw: summary[6].toString(),
                 totalDisbursed: formatEth(summary[7]),
                 totalDisbursedRaw: summary[7].toString(),
-                stablecoinRaised: formatEth(extra[0]),
-                stablecoinDisbursed: formatEth(extra[1]),
+                stablecoinRaised: formatTokenAmount(extra[0], 6),
+                stablecoinRaisedRaw: extra[0].toString(),
+                stablecoinDisbursed: formatTokenAmount(extra[1], 6),
                 deadline: Number(extra[2]),
                 cancelled: extra[3],
               };
@@ -222,6 +227,9 @@ export default function Home({ user }) {
           <div className={styles.tickerInfo}>
             <span className={styles.tickerLabel}>Ethereum (ETH)</span>
             <span className={styles.tickerPrice}>{formatTickerPrice(tickerData.eth?.price)}</span>
+            {tickerData.eth?.usd != null && (
+              <span className={styles.tickerUsd}>${tickerData.eth.usd.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</span>
+            )}
             {tickerData.eth?.change != null && (
               <span className={`${styles.tickerChange} ${tickerData.eth.change >= 0 ? styles.tickerUp : styles.tickerDown}`}>
                 {formatTickerChange(tickerData.eth.change)} 24h
@@ -236,6 +244,9 @@ export default function Home({ user }) {
           <div className={styles.tickerInfo}>
             <span className={styles.tickerLabel}>Bitcoin (BTC)</span>
             <span className={styles.tickerPrice}>{formatTickerPrice(tickerData.btc?.price)}</span>
+            {tickerData.btc?.usd != null && (
+              <span className={styles.tickerUsd}>${tickerData.btc.usd.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</span>
+            )}
             {tickerData.btc?.change != null && (
               <span className={`${styles.tickerChange} ${tickerData.btc.change >= 0 ? styles.tickerUp : styles.tickerDown}`}>
                 {formatTickerChange(tickerData.btc.change)} 24h
@@ -335,9 +346,12 @@ export default function Home({ user }) {
               const chain = chainData[c.smartContractId];
               const status = getCampaignStatus(chain);
               const isExpired = chain?.deadline > 0 && Date.now() / 1000 > chain.deadline;
-              const canDonate = isDonorOrGuest && !chain?.cancelled && !isExpired && status?.key !== "completed";
+              const canDonate = isDonorOrGuest && !chain?.cancelled && !isExpired && status?.key !== "completed" && status?.key !== "funded";
 
-              const raised = chain ? parseFloat(chain.raisedAmount) : 0;
+              const raisedEth = chain ? parseFloat(chain.raisedAmount) : 0;
+              const stableRaised = chain ? parseFloat(chain.stablecoinRaised || 0) : 0;
+              const stableInEth = ethUsdPrice ? stablecoinToEth(stableRaised, ethUsdPrice) : 0;
+              const raised = raisedEth + stableInEth;
               const goal = parseFloat(c.goal);
               const percent = goal > 0 ? Math.min(Math.round((raised / goal) * 100), 100) : 0;
 
@@ -370,9 +384,19 @@ export default function Home({ user }) {
 
                     <div className={styles.progressSection}>
                       <div className={styles.progressHeader}>
-                        <span className={styles.progressRaised}>{raised} ETH</span>
+                        <span className={styles.progressRaised}>{raised.toFixed(4)} ETH</span>
                         <span className={styles.progressGoal}>of {goal} ETH goal</span>
                       </div>
+                      {ethFiat && (
+                        <div className={styles.fiatLine}>
+                          {ethFiat.gbp ? `£${(goal * ethFiat.gbp).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : ''}
+                          {ethFiat.usd ? ` · $${(goal * ethFiat.usd).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : ''}
+                          {ethFiat.eur ? ` · €${(goal * ethFiat.eur).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : ''}
+                        </div>
+                      )}
+                      {stableRaised > 0 && (
+                        <div className={styles.stableNote}>incl. {stableRaised.toFixed(2)} mUSDT ({stableInEth.toFixed(4)} ETH equiv.)</div>
+                      )}
                       <div className={styles.progressTrack}>
                         <div
                           className={`${styles.progressFill} ${percent >= 100 ? styles.progressFillComplete : ''}`}
@@ -390,7 +414,7 @@ export default function Home({ user }) {
                       {canDonate ? (
                         <button
                           className={styles.contributeBtn}
-                          onClick={(e) => { e.stopPropagation(); donate(c); }}
+                          onClick={(e) => { e.stopPropagation(); navigate(`/campaign/${c.smartContractId}`); }}
                         >
                           Contribute
                         </button>

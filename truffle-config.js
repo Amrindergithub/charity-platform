@@ -24,6 +24,17 @@ module.exports = {
       skipDryRun: true,
       gas: 20000000,
       gasPrice: 3000000000
+    },
+    sepolia: {
+      provider: () => new HDWalletProvider(
+        process.env.DEPLOYER_PRIVATE_KEY,
+        process.env.SEPOLIA_RPC || "https://rpc.sepolia.org"
+      ),
+      network_id: 11155111,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      gas: 8000000
     }
   },
   compilers: {

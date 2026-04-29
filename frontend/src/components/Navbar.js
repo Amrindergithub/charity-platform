@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { shortenAddress } from "../utils/ethereum";
+import NotificationBell from "./NotificationBell";
 import styles from "./Navbar.module.css";
 
 export default function Navbar({ user, onLogout }) {
@@ -16,7 +17,8 @@ export default function Navbar({ user, onLogout }) {
       if (window.ethereum) {
         try {
           const chainId = await window.ethereum.request({ method: "eth_chainId" });
-          setNetworkOk(chainId === "0x1691" || chainId === "0x539"); // 5777 or 1337
+          // Accept Ganache (5777=0x1691, 1337=0x539), Sepolia (11155111=0xaa36a7), Polygon Amoy (80002=0x13882)
+          setNetworkOk(["0x1691", "0x539", "0xaa36a7", "0x13882"].includes(chainId));
         } catch { setNetworkOk(false); }
       }
     };
@@ -80,6 +82,7 @@ export default function Navbar({ user, onLogout }) {
             )}
 
             <div className={styles.userSection}>
+              <NotificationBell user={user} />
               <button onClick={onLogout} className={styles.logoutBtn} title="Logout">
                 <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>logout</span>
               </button>
