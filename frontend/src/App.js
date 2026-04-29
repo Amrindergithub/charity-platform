@@ -59,6 +59,7 @@ function App() {
             <Suspense fallback={<div style={{display:'flex',justifyContent:'center',padding:'60px',color:'var(--gray-400)'}}>Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home user={loggedInUser} />} />
+              <Route path="/campaigns" element={<Navigate to="/" replace />} />
               <Route path="/login" element={loggedInUser ? <Navigate to="/dashboard" replace /> : <Login setLoggedInUser={setLoggedInUser} />} />
               <Route path="/register" element={loggedInUser ? <Navigate to="/dashboard" replace /> : <Register />} />
               <Route path="/dashboard" element={

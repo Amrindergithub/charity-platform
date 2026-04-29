@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { apiFetch, shortenAddress } from "../utils/ethereum";
+import { apiFetch, shortenAddress, getEthUsdPrice, stablecoinToEth } from "../utils/ethereum";
 import { useToast } from "../components/Toast";
 import DonationReceipt from "../components/DonationReceipt";
 import styles from "./MyDonations.module.css";
@@ -9,11 +9,13 @@ export default function MyDonations({ user }) {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [receiptDonation, setReceiptDonation] = useState(null);
+  const [ethUsdPrice, setEthUsdPrice] = useState(null);
   const toast = useToast();
 
   useEffect(() => {
     if (user?.walletAddress) loadDonations();
     else setLoading(false);
+    getEthUsdPrice().then(setEthUsdPrice);
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadDonations = async () => {
@@ -81,6 +83,8 @@ export default function MyDonations({ user }) {
   const totalStable = donations
     .filter(d => d.currency && d.currency !== "ETH")
     .reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
+  const stableInEth = ethUsdPrice ? stablecoinToEth(totalStable, ethUsdPrice) : 0;
+  const totalEquiv = totalETH + stableInEth;
   const uniqueCampaigns = [...new Set(donations.map((d) => d.campaignId))];
 
   const getBadgeClass = (index) => {
@@ -113,14 +117,13 @@ export default function MyDonations({ user }) {
           <div className={styles.heroMain}>
             <p className={styles.heroLabel}>Total Life-Time Impact</p>
             <h1 className={styles.heroValue}>
-              {totalETH.toFixed(4)} <span className={styles.heroUnit}>ETH</span>
+              {totalEquiv.toFixed(4)} <span className={styles.heroUnit}>ETH</span>
             </h1>
-            {totalStable > 0 && (
+            {totalStable > 0 ? (
               <p className={styles.heroDesc}>
-                Plus {totalStable.toFixed(2)} in stablecoin contributions across {uniqueCampaigns.length} campaign{uniqueCampaigns.length !== 1 ? "s" : ""}
+                {totalETH.toFixed(4)} ETH + {totalStable.toFixed(2)} mUSDT ({stableInEth.toFixed(4)} ETH equiv.) across {uniqueCampaigns.length} campaign{uniqueCampaigns.length !== 1 ? "s" : ""}
               </p>
-            )}
-            {totalStable === 0 && (
+            ) : (
               <p className={styles.heroDesc}>
                 Blockchain-verified donations across {uniqueCampaigns.length} campaign{uniqueCampaigns.length !== 1 ? "s" : ""}
               </p>

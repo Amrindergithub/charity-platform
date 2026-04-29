@@ -7,6 +7,7 @@ const CHAIN_ID = parseInt(process.env.REACT_APP_CHAIN_ID || "5777");
 // Chain metadata for UI display
 export const CHAIN_NAMES = {
   5777: "Ganache (Local)",
+  11155111: "Sepolia (Testnet)",
   80002: "Polygon Amoy (Testnet)",
   137: "Polygon Mainnet",
   1: "Ethereum Mainnet"
@@ -90,6 +91,50 @@ export async function connectWallet() {
 export function shortenAddress(addr) {
   if (!addr) return "";
   return addr.substring(0, 6) + "..." + addr.substring(addr.length - 4);
+}
+
+// ── ETH Price Cache (for stablecoin→ETH conversion) ──
+let ethPriceCache = { price: null, timestamp: 0 };
+const ETH_PRICE_TTL = 60000; // 1 minute cache
+
+export async function getEthUsdPrice() {
+  if (ethPriceCache.price && Date.now() - ethPriceCache.timestamp < ETH_PRICE_TTL) {
+    return ethPriceCache.price;
+  }
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+    const data = await res.json();
+    const price = data?.ethereum?.usd;
+    if (price) {
+      ethPriceCache = { price, timestamp: Date.now() };
+      return price;
+    }
+  } catch (e) {
+    console.warn('ETH price fetch failed:', e.message);
+  }
+  return ethPriceCache.price || 2500; // fallback
+}
+
+export function stablecoinToEth(stablecoinAmount, ethUsdPrice) {
+  if (!ethUsdPrice || ethUsdPrice <= 0) return 0;
+  return parseFloat(stablecoinAmount) / ethUsdPrice;
+}
+
+// ── Multi-fiat ETH price (USD/GBP/EUR via CoinGecko) ──
+let ethFiatCache = { data: null, timestamp: 0 };
+export async function getEthFiatRates() {
+  if (ethFiatCache.data && Date.now() - ethFiatCache.timestamp < ETH_PRICE_TTL) {
+    return ethFiatCache.data;
+  }
+  try {
+    const res = await fetch(`${API_URL}/api/eth-price`);
+    const data = await res.json();
+    if (data && data.usd) {
+      ethFiatCache = { data, timestamp: Date.now() };
+      return data;
+    }
+  } catch (e) { console.warn('ETH fiat fetch failed:', e.message); }
+  return ethFiatCache.data;
 }
 
 // ── Formatting ──

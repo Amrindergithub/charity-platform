@@ -1,46 +1,87 @@
 import { useState, useEffect } from "react";
-import { getContract, apiFetch, formatEth } from "../utils/ethereum";
+import { getContract, getProvider, apiFetch, formatEth, formatTokenAmount } from "../utils/ethereum";
 import { SkeletonStats } from "../components/Skeleton";
 import styles from "./TransparencyDashboard.module.css";
 
-/* Static audit trail entries for the timeline */
-const AUDIT_TRAIL = [
-  { time: "2 min ago", desc: "Spending request #47 approved by DAO vote (8/12 quorum)", hash: "0x7a3f...e91c" },
-  { time: "18 min ago", desc: "Campaign #23 milestone 2 funds released", hash: "0xb4c1...3d7a" },
-  { time: "1 hr ago", desc: "New campaign registered: Clean Water Initiative", hash: "0xf8e2...a04b" },
-  { time: "3 hr ago", desc: "Auto-refund triggered for expired campaign #19", hash: "0x2d91...c8f3" },
-  { time: "6 hr ago", desc: "Platform integrity audit completed -- all clear", hash: "0x91ab...7e20" },
-];
+function formatRelativeTime(date) {
+  const ms = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(ms / 60000);
+  if (mins < 1) return "now";
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr${hrs > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
 
-/* Static bar data for transparency flow chart */
-const FLOW_BARS = [
-  32, 48, 28, 64, 52, 72, 40, 88, 56, 44, 80, 36, 68, 92, 60,
-  76, 48, 84, 56, 72, 40, 96, 64, 52, 80
-];
+function shortenHash(hash) {
+  if (!hash) return "—";
+  return hash.length > 12 ? `${hash.substring(0, 6)}...${hash.substring(hash.length - 4)}` : hash;
+}
 
 export default function TransparencyDashboard() {
   const [dbStats, setDbStats] = useState(null);
   const [chainStats, setChainStats] = useState(null);
+  const [flowBuckets, setFlowBuckets] = useState([]);
+  const [auditTrail, setAuditTrail] = useState([]);
+  const [trends, setTrends] = useState(null);
+  const [blockNumber, setBlockNumber] = useState(null);
+  const [networkOk, setNetworkOk] = useState(false);
+  const [cancelledCount, setCancelledCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadStats(); }, []);
+  useEffect(() => {
+    loadStats();
+    const interval = setInterval(loadStats, 30000); // refresh every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   const loadStats = async () => {
     try {
-      const stats = await apiFetch("/stats");
+      const [stats, flow, audit, trendData] = await Promise.all([
+        apiFetch("/stats"),
+        apiFetch("/analytics/flow-24h"),
+        apiFetch("/analytics/audit-trail?limit=8"),
+        apiFetch("/analytics/trend-summary?days=30"),
+      ]);
       setDbStats(stats);
+      setFlowBuckets(flow);
+      setAuditTrail(audit);
+      setTrends(trendData);
+
       if (window.ethereum) {
         try {
           const contract = await getContract();
           const platform = await contract.getPlatformStats();
+          const totalCampaigns = Number(platform[0]);
           setChainStats({
-            totalCampaigns: Number(platform[0]),
+            totalCampaigns,
             totalDonations: formatEth(platform[1]),
-            totalStablecoin: formatEth(platform[2]),
+            totalStablecoin: formatTokenAmount(platform[2], 6),
             totalFinalized: Number(platform[3]),
             contractBalance: formatEth(platform[4]),
           });
-        } catch (e) { console.warn("Could not load chain stats:", e.message); }
+
+          // Count cancelled campaigns for integrity score
+          let cancelled = 0;
+          for (let i = 0; i < totalCampaigns; i++) {
+            try {
+              const ex = await contract.getCampaignExtra(i);
+              if (ex[3]) cancelled++;
+            } catch { /* ignore */ }
+          }
+          setCancelledCount(cancelled);
+
+          // Real block number from provider
+          try {
+            const bn = await getProvider().getBlockNumber();
+            setBlockNumber(bn);
+            setNetworkOk(true);
+          } catch { setNetworkOk(false); }
+        } catch (e) {
+          console.warn("Could not load chain stats:", e.message);
+          setNetworkOk(false);
+        }
       }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -62,11 +103,54 @@ export default function TransparencyDashboard() {
 
   /* Compute stats for the bento grid */
   const totalVerified = chainStats ? chainStats.totalFinalized : (dbStats?.totalDonations || 0);
-  const integrityScore = chainStats ? "99.7%" : "---";
+  // Integrity score: % campaigns not cancelled
+  const integrityScore = (() => {
+    if (!chainStats || chainStats.totalCampaigns === 0) return "—";
+    const ok = chainStats.totalCampaigns - cancelledCount;
+    return `${((ok / chainStats.totalCampaigns) * 100).toFixed(1)}%`;
+  })();
   const globalNodes = dbStats ? dbStats.totalUsers : 0;
   const co2Offset = chainStats
     ? `${(parseFloat(chainStats.totalDonations) * 2.4).toFixed(1)}t`
     : "0t";
+
+  // Real flow chart bars (scale by amount or count)
+  const flowTotal = flowBuckets.reduce((s, b) => s + (b.count || 0), 0);
+  const flowMax = Math.max(...flowBuckets.map(b => b.amount || b.count || 0), 1);
+  const renderFlowBars = () => flowBuckets.map((b, i) => {
+    const value = b.amount || b.count || 0;
+    const heightPct = value > 0 ? Math.max(8, (value / flowMax) * 100) : 2;
+    return (
+      <div
+        key={i}
+        className={styles.chartBar}
+        style={{ height: `${heightPct}%`, opacity: value > 0 ? 1 : 0.25 }}
+        title={`${new Date(b.hour).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — ${b.count} txn${b.count !== 1 ? 's' : ''}, ${b.amount.toFixed(4)}`}
+      />
+    );
+  });
+
+  // Trend chips: hide if null delta or zero current
+  const renderTrendChip = (trend) => {
+    if (!trend) return null;
+    const { current, deltaPct } = trend;
+    if (deltaPct === null || deltaPct === undefined) {
+      return <div className={styles.statTrend}><span>New</span></div>;
+    }
+    if (current === 0) {
+      return <div className={styles.statTrend}><span>No activity 30d</span></div>;
+    }
+    const up = deltaPct >= 0;
+    const cls = up ? `${styles.statTrend} ${styles.statTrendUp}` : styles.statTrend;
+    return (
+      <div className={cls}>
+        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+          {up ? "trending_up" : "trending_down"}
+        </span>
+        <span>{up ? "+" : ""}{deltaPct}%</span>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -87,27 +171,27 @@ export default function TransparencyDashboard() {
           <span className={`material-symbols-outlined ${styles.statIcon}`}>light_mode</span>
           <p className={styles.statLabel}>Total Verified</p>
           <p className={styles.statValue}>{totalVerified}</p>
-          <div className={`${styles.statTrend} ${styles.statTrendUp}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            <span>+12.4%</span>
-          </div>
+          {renderTrendChip(trends?.donationCount)}
         </div>
         <div className={styles.statCard}>
           <span className={`material-symbols-outlined ${styles.statIcon}`}>verified_user</span>
           <p className={styles.statLabel}>Integrity Score</p>
           <p className={styles.statValue}>{integrityScore}</p>
           <div className={styles.statTrend}>
-            <span>Audited</span>
+            <span>
+              {!chainStats || chainStats.totalCampaigns === 0
+                ? "No campaigns yet"
+                : cancelledCount === 0
+                  ? "All campaigns active"
+                  : `${chainStats.totalCampaigns - cancelledCount} of ${chainStats.totalCampaigns} active`}
+            </span>
           </div>
         </div>
         <div className={styles.statCard}>
           <span className={`material-symbols-outlined ${styles.statIcon}`}>hub</span>
           <p className={styles.statLabel}>Global Nodes</p>
           <p className={styles.statValue}>{globalNodes}</p>
-          <div className={`${styles.statTrend} ${styles.statTrendUp}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            <span>+8.2%</span>
-          </div>
+          {renderTrendChip(trends?.users)}
         </div>
         <div className={styles.statCard}>
           <span className={`material-symbols-outlined ${styles.statIcon}`}>co2</span>
@@ -133,9 +217,19 @@ export default function TransparencyDashboard() {
               <div className={styles.gridLine} style={{ bottom: "25%" }} />
               <div className={styles.gridLine} style={{ bottom: "50%" }} />
               <div className={styles.gridLine} style={{ bottom: "75%" }} />
-              {FLOW_BARS.map((h, i) => (
-                <div key={i} className={styles.chartBar} style={{ height: `${h}%` }} />
-              ))}
+              {renderFlowBars()}
+              {flowTotal === 0 && (
+                <div style={{
+                  position: "absolute", inset: 0, display: "flex",
+                  alignItems: "center", justifyContent: "center",
+                  color: "var(--sn-on-surface-variant, #E4BEB1)",
+                  fontSize: "0.75rem", letterSpacing: "0.1em",
+                  textTransform: "uppercase", opacity: 0.6,
+                  pointerEvents: "none"
+                }}>
+                  No donation activity in the last 24 hours
+                </div>
+              )}
             </div>
           </div>
 
@@ -145,20 +239,20 @@ export default function TransparencyDashboard() {
               <p className={styles.networkTitle}>Network Health</p>
               <div className={styles.ringContainer}>
                 <div className={styles.ring} />
-                <span className={styles.ringLabel}>99%</span>
+                <span className={styles.ringLabel}>{networkOk ? "100%" : "0%"}</span>
               </div>
               <div className={styles.statusList}>
                 <div className={styles.statusItem}>
-                  <span className={styles.statusDotGreen} />
-                  <span>Consensus Active</span>
+                  <span className={networkOk ? styles.statusDotGreen : styles.statusDotOrange} />
+                  <span>{networkOk ? "Consensus Active" : "Disconnected"}</span>
                 </div>
                 <div className={styles.statusItem}>
                   <span className={styles.statusDotOrange} />
-                  <span>Mempool: {chainStats ? chainStats.totalCampaigns : 0} pending</span>
+                  <span>Active Campaigns: {chainStats ? chainStats.totalCampaigns - cancelledCount : 0}</span>
                 </div>
                 <div className={styles.statusItem}>
                   <span className={styles.statusDotBlue} />
-                  <span>Peer Count: {globalNodes}</span>
+                  <span>Registered Users: {globalNodes}</span>
                 </div>
               </div>
             </div>
@@ -167,7 +261,7 @@ export default function TransparencyDashboard() {
               <p className={styles.networkTitle}>Block Sync</p>
               <div>
                 <p className={styles.blockNumber}>
-                  #{chainStats ? (21400000 + chainStats.totalFinalized * 137).toLocaleString() : "---"}
+                  #{blockNumber !== null ? blockNumber.toLocaleString() : "—"}
                 </p>
                 <p className={styles.blockLabel}>Latest Block</p>
               </div>
@@ -182,20 +276,29 @@ export default function TransparencyDashboard() {
             <span className={styles.auditTitle}>Audit Trail</span>
           </div>
           <div className={styles.timeline}>
-            {AUDIT_TRAIL.map((item, i) => (
+            {auditTrail.length === 0 ? (
+              <p className={styles.timelineDesc} style={{ opacity: 0.6, padding: "1rem 0" }}>
+                No on-chain activity yet.
+              </p>
+            ) : auditTrail.map((item, i) => (
               <div key={i} className={styles.timelineItem}>
-                <p className={styles.timelineTime}>{item.time}</p>
+                <p className={styles.timelineTime}>{formatRelativeTime(item.at)}</p>
                 <p className={styles.timelineDesc}>{item.desc}</p>
                 <span className={styles.timelineHash}>
-                  {item.hash}
-                  <a href="#ledger" className={styles.timelineLedgerLink}>
-                    View on Ledger
-                  </a>
+                  {shortenHash(item.hash)}
+                  {item.hash && (
+                    <a
+                      href={`https://amoy.polygonscan.com/tx/${item.hash}`}
+                      target="_blank" rel="noreferrer"
+                      className={styles.timelineLedgerLink}
+                    >
+                      View on Ledger
+                    </a>
+                  )}
                 </span>
               </div>
             ))}
           </div>
-          <button className={styles.loadArchiveBtn}>Load Archive</button>
         </div>
       </div>
 

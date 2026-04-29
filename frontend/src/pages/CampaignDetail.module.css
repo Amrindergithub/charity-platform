@@ -10,16 +10,16 @@
 
 /* ── Back Header ── */
 .backHeader {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(to bottom, var(--sn-bg, #0A0A0A), transparent);
+  padding: 5rem 2rem 1rem;
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0.5) 60%, transparent 100%);
 }
 
 .backLink {
@@ -29,9 +29,9 @@
   color: var(--sn-on-surface, #E5E2E1);
   text-decoration: none;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: color 0.2s;
 }
@@ -68,7 +68,7 @@
 .heroSection {
   position: relative;
   width: 100%;
-  height: 614px;
+  height: 420px;
   overflow: hidden;
 }
 
@@ -84,8 +84,9 @@
   background: linear-gradient(
     to top,
     var(--sn-bg, #0A0A0A) 0%,
-    rgba(10, 10, 10, 0.8) 30%,
-    transparent 70%
+    rgba(10, 10, 10, 0.85) 35%,
+    rgba(10, 10, 10, 0.3) 65%,
+    transparent 100%
   );
 }
 
@@ -94,7 +95,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 0 1.5rem 3rem 1.5rem;
+  padding: 0 2rem 2rem 2rem;
   z-index: 10;
 }
 
@@ -135,15 +136,15 @@
 
 .heroTitle {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.015em;
   color: #FFFFFF;
-  text-transform: uppercase;
-  line-height: 1.05;
-  max-width: 56rem;
+  text-transform: none;
+  line-height: 1.15;
+  max-width: 48rem;
   margin: 0;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
 }
 
 /* ── Creator Bar ── */
@@ -152,8 +153,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  margin: -1rem 1.5rem 0;
-  background: rgba(20, 20, 20, 0.5);
+  margin: 0 2rem;
+  background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--sn-outline-variant, #5B4137);
@@ -231,7 +232,7 @@
 .navTabs {
   display: flex;
   gap: 0.5rem;
-  padding: 1.5rem 1.5rem 0;
+  padding: 1.5rem 2rem 0;
   max-width: 1280px;
   margin: 0 auto;
   overflow-x: auto;
@@ -272,7 +273,7 @@
 
 /* ── Content Wrapper & Grid ── */
 .contentWrapper {
-  padding: 2rem 1.5rem;
+  padding: 2rem 2rem;
   max-width: 1280px;
   margin: 0 auto;
 }
@@ -732,6 +733,14 @@
   margin-top: 0.375rem;
 }
 
+.stableBreakdown {
+  font-size: 0.6875rem;
+  color: var(--sn-primary, #FFB59A);
+  opacity: 0.85;
+  margin-top: 0.25rem;
+  font-family: var(--sn-font-body, "Inter", sans-serif);
+}
+
 /* ── Progress Bar ── */
 .progressTrack {
   width: 100%;
@@ -1074,4 +1083,177 @@
   .raisedAmount {
     font-size: 2rem;
   }
+}
+
+/* ── Donate Modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.donateModalContent {
+  background: var(--sn-surface, #1A1A1A);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 440px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.donateModalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sn-text, #EAEAEA);
+  margin-bottom: 0.25rem;
+}
+
+.donateModalTitle .material-symbols-outlined {
+  color: var(--sn-primary, #FF5C00);
+  font-size: 1.5rem;
+}
+
+.donateModalCampaign {
+  color: var(--sn-primary, #FF5C00);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.donateFormGroup {
+  margin-bottom: 1.25rem;
+}
+
+.donateLabel {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sn-text-dim, #888);
+  margin-bottom: 0.5rem;
+}
+
+.currencyToggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.currencyBtn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--sn-text-dim, #888);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.currencyBtn:hover {
+  border-color: rgba(255, 92, 0, 0.3);
+  color: var(--sn-text, #EAEAEA);
+}
+
+.currencyActive {
+  background: rgba(255, 92, 0, 0.12);
+  border-color: var(--sn-primary, #FF5C00);
+  color: var(--sn-primary, #FF5C00);
+}
+
+.donateInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--sn-text, #EAEAEA);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.donateInput:focus {
+  border-bottom-color: var(--sn-primary, #FF5C00);
+}
+
+.donateInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.donateHint {
+  font-size: 0.75rem;
+  color: var(--sn-text-dim, #888);
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+}
+
+.donateActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.donateCancelBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--sn-text-dim, #888);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.donateCancelBtn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--sn-text, #EAEAEA);
+}
+
+.donateConfirmBtn {
+  flex: 2;
+  padding: 0.75rem;
+  background: var(--sn-primary, #FF5C00);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.donateConfirmBtn:hover {
+  background: #FF7A2E;
+  box-shadow: 0 0 24px rgba(255, 92, 0, 0.3);
+}
+
+.donateConfirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

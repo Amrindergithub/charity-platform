@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ethers } from "ethers";
-import { getContract, apiFetch, apiPost, formatEth, shortenAddress, API_URL, getAuthToken, aiGenerateCampaign } from "../utils/ethereum";
+import { getContract, apiFetch, apiPost, formatEth, shortenAddress, API_URL, getAuthToken, aiGenerateCampaign, getEthUsdPrice, stablecoinToEth } from "../utils/ethereum";
 import { getCampaignStatus } from "../utils/campaignHelpers";
 import { useToast } from "../components/Toast";
 import ProgressBar from "../components/ProgressBar";
@@ -44,6 +44,7 @@ export default function Dashboard({ user }) {
   const [chainData, setChainData] = useState({});
   const [myDonations, setMyDonations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ethUsdPrice, setEthUsdPrice] = useState(null);
 
   // Tabs
   const [charityTab, setCharityTab] = useState("create");
@@ -57,6 +58,7 @@ export default function Dashboard({ user }) {
     };
     if (user) load();
     else setLoading(false);
+    getEthUsdPrice().then(setEthUsdPrice);
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMyCampaigns = async () => {
@@ -261,9 +263,43 @@ export default function Dashboard({ user }) {
   };
 
   /* ── Computed values for hero stats ── */
+  const donorEthTotal = myDonations.filter(d => !d.currency || d.currency === "ETH").reduce((s, d) => s + parseFloat(d.amount || 0), 0);
+  const donorStableTotal = myDonations.filter(d => d.currency && d.currency !== "ETH").reduce((s, d) => s + parseFloat(d.amount || 0), 0);
+  const donorStableInEth = ethUsdPrice ? stablecoinToEth(donorStableTotal, ethUsdPrice) : 0;
   const totalRaised = user?.role === "charity"
     ? Object.values(chainData).reduce((sum, cd) => sum + parseFloat(cd.raised || 0), 0).toFixed(4)
-    : myDonations.reduce((s, d) => s + parseFloat(d.amount || 0), 0).toFixed(4);
+    : (donorEthTotal + donorStableInEth).toFixed(4);
+
+  // Build real sparkline points from cumulative donation history (donor) or campaign raised (charity)
+  const buildSparkline = () => {
+    let series = [];
+    if (user?.role === "donor") {
+      const sorted = [...myDonations].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      let cum = 0;
+      series = sorted.map(d => {
+        const eth = (!d.currency || d.currency === "ETH")
+          ? parseFloat(d.amount || 0)
+          : (ethUsdPrice ? parseFloat(d.amount || 0) / ethUsdPrice : 0);
+        cum += eth;
+        return cum;
+      });
+    } else if (user?.role === "charity") {
+      // Cumulative across own campaigns (sorted by smartContractId as proxy for time)
+      const ids = Object.keys(chainData).sort((a, b) => Number(a) - Number(b));
+      let cum = 0;
+      series = ids.map(k => { cum += parseFloat(chainData[k].raised || 0); return cum; });
+    }
+    if (series.length < 2) return null;
+    const last = series.slice(-12); // last 12 points
+    const max = Math.max(...last, 0.0001);
+    const w = 100, h = 40;
+    return last.map((v, i) => {
+      const x = (i / (last.length - 1)) * w;
+      const y = h - (v / max) * (h - 4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+  };
+  const sparklinePoints = buildSparkline();
   const activeCampaignCount = user?.role === "charity"
     ? myCampaigns.filter(c => { const s = getCampaignStatus(chainData[c.smartContractId]); return s?.key === 'active'; }).length
     : [...new Set(myDonations.map(d => d.campaignId))].length;
@@ -313,9 +349,14 @@ export default function Dashboard({ user }) {
           </div>
           <div className={styles.heroStatValue}>{totalRaised} ETH</div>
           <div className={styles.heroStatLabel}>{user.role === "charity" ? "Total Raised" : "Total Donated"}</div>
-          <svg className={styles.sparkline} viewBox="0 0 100 40" preserveAspectRatio="none">
-            <polyline points="0,35 15,28 30,32 45,20 60,24 75,12 90,8 100,15" fill="none" stroke="var(--color-primary)" strokeWidth="2"/>
-          </svg>
+          {user.role === "donor" && donorStableTotal > 0 && (
+            <div className={styles.heroStatBreakdown}>{donorEthTotal.toFixed(4)} ETH + {donorStableTotal.toFixed(2)} mUSDT</div>
+          )}
+          {sparklinePoints && (
+            <svg className={styles.sparkline} viewBox="0 0 100 40" preserveAspectRatio="none">
+              <polyline points={sparklinePoints} fill="none" stroke="var(--color-primary)" strokeWidth="2"/>
+            </svg>
+          )}
         </div>
         <div className={styles.heroStatCard}>
           <div className={styles.heroStatTop}>
@@ -642,9 +683,12 @@ export default function Dashboard({ user }) {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                   </div>
                   <div className={styles.statCardValuePrimary}>
-                    {myDonations.reduce((s, d) => s + parseFloat(d.amount || 0), 0).toFixed(4)} ETH
+                    {totalRaised} ETH
                   </div>
                   <div className={styles.statCardLabel}>Total Donated</div>
+                  {donorStableTotal > 0 && (
+                    <div className={styles.statCardBreakdown}>{donorEthTotal.toFixed(4)} ETH + {donorStableTotal.toFixed(2)} mUSDT</div>
+                  )}
                 </div>
                 <div className={styles.statCard}>
                   <div className={styles.statCardIconSecondary}>

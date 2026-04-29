@@ -1,12 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getContract, apiFetch, apiPost, formatEth, formatTokenAmount, shortenAddress, API_URL, aiAnalyzeRequest } from "../utils/ethereum";
+import { ethers } from "ethers";
+import { getContract, getSigner, getContractAddr, apiFetch, apiPost, formatEth, formatTokenAmount, getEthUsdPrice, stablecoinToEth, shortenAddress, API_URL, aiAnalyzeRequest } from "../utils/ethereum";
 import { getCampaignStatus } from "../utils/campaignHelpers";
 import { useToast } from "../components/Toast";
 import Modal from "../components/Modal";
 import DonationReceipt from "../components/DonationReceipt";
 import { SkeletonCard, SkeletonStats } from "../components/Skeleton";
 import styles from "./CampaignDetail.module.css";
+
+const ERC20_ABI = [
+  "function approve(address spender, uint256 amount) returns (bool)",
+  "function decimals() view returns (uint8)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function allowance(address owner, address spender) view returns (uint256)"
+];
 
 export default function CampaignDetail({ user }) {
   const { id } = useParams();
@@ -49,21 +57,27 @@ export default function CampaignDetail({ user }) {
   // Track which AI analyses have been queued (prevents infinite retry loop)
   const aiQueuedRef = useRef(new Set());
 
+  // Donate modal
+  const [donateModal, setDonateModal] = useState(false);
+  const [donateAmount, setDonateAmount] = useState("");
+  const [donateCurrency, setDonateCurrency] = useState("ETH");
+  const [ethUsdPrice, setEthUsdPrice] = useState(null);
+
   // Navigation tabs
   const [activeTab, setActiveTab] = useState("about");
 
-  useEffect(() => { loadAll(); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { loadAll(); getEthUsdPrice().then(setEthUsdPrice); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-load AI analysis for donors when requests are available
+  // Auto-load AI analysis for any donor viewing the campaign (so they can make informed donation decisions)
   useEffect(() => {
-    if (user?.role !== "donor" || !isDonor || requests.length === 0) return;
+    if (user?.role !== "donor" || requests.length === 0) return;
     requests.forEach(req => {
       if (!req.complete && !aiQueuedRef.current.has(req.index) && !aiAnalyses[req.index]?.report && !aiAnalyses[req.index]?.loading) {
         aiQueuedRef.current.add(req.index);
         handleAiAnalyze(req);
       }
     });
-  }, [requests, isDonor, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [requests, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadAll = async () => {
     setLoading(true);
@@ -222,8 +236,8 @@ export default function CampaignDetail({ user }) {
       await tx.wait();
 
       // Auto-post cancellation reason as a campaign update
+      const reason = cancelReason.trim() || "No reason provided.";
       try {
-        const reason = cancelReason.trim() || "No reason provided.";
         const newUpdate = await apiPost("/campaign-updates", {
           campaignId: parseInt(id),
           title: "Campaign Cancelled",
@@ -231,6 +245,15 @@ export default function CampaignDetail({ user }) {
         });
         setUpdates(prev => [newUpdate, ...prev]);
       } catch { /* update post failed, not critical */ }
+
+      // Broadcast notification to all donors of this campaign
+      try {
+        await apiPost("/notifications/cancel-broadcast", {
+          campaignId: parseInt(id),
+          reason,
+          txHash: tx.hash,
+        });
+      } catch (e) { console.warn('Notification broadcast failed:', e.message); }
 
       setCancelReason("");
       toast.success("Campaign cancelled. All donors have been automatically refunded.");
@@ -277,6 +300,66 @@ export default function CampaignDetail({ user }) {
       toast.error(err.message);
     } finally {
       setPostingUpdate(false);
+    }
+  };
+
+  // ── Donate Handler ──
+  const handleDonate = async () => {
+    if (!user) return toast.error("Please log in to donate");
+    if (user.role !== "donor") return toast.error("Only donors can contribute");
+    if (!donateAmount || parseFloat(donateAmount) <= 0) return toast.warning("Enter a valid donation amount");
+
+    setActionLoading("donate");
+    try {
+      const contract = await getContract();
+      let receipt;
+
+      if (donateCurrency === "ETH") {
+        const tx = await contract.donate(id, { value: ethers.parseEther(donateAmount) });
+        receipt = await tx.wait();
+      } else {
+        // ERC-20 stablecoin flow
+        const stablecoinAddr = await contract.stablecoinAddress();
+        if (stablecoinAddr === ethers.ZeroAddress) {
+          toast.error("Stablecoin not configured on this contract");
+          setActionLoading(null);
+          return;
+        }
+        const signer = await getSigner();
+        const tokenContract = new ethers.Contract(stablecoinAddr, ERC20_ABI, signer);
+
+        let decimals = 6;
+        try { decimals = Number(await tokenContract.decimals()); } catch { /* default 6 */ }
+        const parsedAmount = ethers.parseUnits(donateAmount, decimals);
+
+        toast.info("Approving token spend...");
+        const contractAddress = getContractAddr();
+        const approveTx = await tokenContract.approve(contractAddress, parsedAmount);
+        await approveTx.wait();
+        toast.info("Approval confirmed. Sending donation...");
+
+        const tx = await contract.donateStablecoin(id, parsedAmount);
+        receipt = await tx.wait();
+      }
+
+      await apiPost("/donations", {
+        campaignId: id,
+        donorWallet: user.walletAddress.toLowerCase(),
+        amount: donateAmount,
+        currency: donateCurrency,
+        txHash: receipt.hash,
+        donorName: user.fullName,
+      });
+
+      toast.success(`Donated ${donateAmount} ${donateCurrency} successfully!`);
+      setDonateModal(false);
+      setDonateAmount("");
+      loadAll();
+    } catch (err) {
+      console.error(err);
+      toast.error("Transaction failed: " + (err.reason || err.message));
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -346,8 +429,12 @@ export default function CampaignDetail({ user }) {
     ? (campaign.imageUrl.startsWith("http") ? campaign.imageUrl : `${API_URL}${campaign.imageUrl}`)
     : null;
 
-  // Progress percentage
-  const progressPct = Math.min(100, ((parseFloat(chainData?.raisedAmount) || 0) / (parseFloat(chainData?.target) || 1)) * 100);
+  // Progress percentage — combine ETH + stablecoin (converted to ETH equiv.)
+  const raisedEth = parseFloat(chainData?.raisedAmount) || 0;
+  const stableRaised = parseFloat(chainData?.stablecoinRaised || 0);
+  const stableInEth = ethUsdPrice ? stablecoinToEth(stableRaised, ethUsdPrice) : 0;
+  const totalRaisedEquiv = raisedEth + stableInEth;
+  const progressPct = Math.min(100, (totalRaisedEquiv / (parseFloat(chainData?.target) || 1)) * 100);
   const daysLeft = chainData?.deadline && !chainData?.cancelled && status?.key !== "expired"
     ? Math.max(0, Math.ceil((chainData.deadline * 1000 - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
@@ -394,6 +481,61 @@ export default function CampaignDetail({ user }) {
         message="Your vote is recorded on-chain and cannot be changed. If this tips approval over 50%, funds will be auto-released to the recipient."
         confirmText="Approve" onConfirm={() => approveRequest(approveModal)} onCancel={() => setApproveModal(null)} />
 
+      {/* Donate Modal */}
+      {donateModal && (
+        <div className={styles.modalOverlay} onClick={() => setDonateModal(false)}>
+          <div className={styles.donateModalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.donateModalTitle}>
+              <span className="material-symbols-outlined">volunteer_activism</span>
+              Back This Project
+            </h3>
+            <p className={styles.donateModalCampaign}>{campaign?.title}</p>
+
+            <div className={styles.donateFormGroup}>
+              <label className={styles.donateLabel}>Currency</label>
+              <div className={styles.currencyToggle}>
+                {["ETH", "mUSDT"].map(cur => (
+                  <button key={cur}
+                    className={`${styles.currencyBtn} ${donateCurrency === cur ? styles.currencyActive : ""}`}
+                    onClick={() => setDonateCurrency(cur)}>
+                    {cur}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.donateFormGroup}>
+              <label className={styles.donateLabel}>Amount</label>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                placeholder={donateCurrency === "ETH" ? "0.1" : "100"}
+                value={donateAmount}
+                onChange={(e) => setDonateAmount(e.target.value)}
+                className={styles.donateInput}
+                autoFocus
+              />
+            </div>
+
+            {chainData?.minContribution && donateCurrency === "ETH" && (
+              <p className={styles.donateHint}>Minimum: {chainData.minContribution} ETH</p>
+            )}
+
+            <div className={styles.donateActions}>
+              <button className={styles.donateCancelBtn} onClick={() => setDonateModal(false)}>Cancel</button>
+              <button
+                className={styles.donateConfirmBtn}
+                onClick={handleDonate}
+                disabled={actionLoading === "donate"}
+              >
+                {actionLoading === "donate" ? "Processing..." : `Donate ${donateAmount || "0"} ${donateCurrency}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Receipt Modal */}
       {receiptDonation && (
         <DonationReceipt donation={receiptDonation} campaignTitle={campaign?.title} onClose={() => setReceiptDonation(null)} />
@@ -420,7 +562,7 @@ export default function CampaignDetail({ user }) {
         {imageUrl ? (
           <img src={imageUrl} alt={campaign?.title} className={styles.heroImage} />
         ) : (
-          <div className={styles.heroImage} style={{ background: "var(--sn-surface, #131313)" }} />
+          <div className={styles.heroImage} style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }} />
         )}
         <div className={styles.heroGradient} />
         <div className={styles.heroContent}>
@@ -460,14 +602,23 @@ export default function CampaignDetail({ user }) {
       <div className={styles.creatorBar}>
         <div className={styles.creatorInfo}>
           <div className={styles.creatorAvatar}>
-            {chainData?.manager ? chainData.manager.substring(2, 4).toUpperCase() : "??"}
+            {(() => {
+              const name = campaign?.createdBy?.fullName;
+              if (name) {
+                const parts = name.trim().split(/\s+/);
+                return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+              }
+              return chainData?.manager ? chainData.manager.substring(2, 4).toUpperCase() : "??";
+            })()}
           </div>
           <div>
             <div className={styles.creatorName}>
-              {chainData?.manager ? shortenAddress(chainData.manager) : "Unknown"}
+              {campaign?.createdBy?.fullName || (chainData?.manager ? shortenAddress(chainData.manager) : "Unknown")}
               <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "var(--sn-primary, #FFB59A)" }}>check_circle</span>
             </div>
-            <div className={styles.creatorSubtitle}>Campaign Creator</div>
+            <div className={styles.creatorSubtitle}>
+              {campaign?.createdBy?.fullName ? shortenAddress(chainData?.manager || "") : "Campaign Creator"}
+            </div>
           </div>
         </div>
         <button className={styles.followBtn}>FOLLOW</button>
@@ -524,6 +675,42 @@ export default function CampaignDetail({ user }) {
                     </div>
                   )}
                 </div>
+
+                {/* AI Trust Analysis (campaign-level, set at creation) */}
+                {(campaign?.aiTrustScore !== null && campaign?.aiTrustScore !== undefined) || campaign?.aiAnalysis ? (
+                  <div className={styles.contentPanel} style={{ borderColor: 'rgba(255, 181, 154, 0.3)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                      <span className="material-symbols-outlined" style={{ color: 'var(--sn-primary, #FFB59A)', fontSize: '1.5rem' }}>auto_awesome</span>
+                      <h3 className={styles.sectionTitle} style={{ margin: 0 }}>AI Trust Assessment</h3>
+                      {campaign.aiTrustScore !== null && campaign.aiTrustScore !== undefined && (
+                        <span style={{
+                          marginLeft: 'auto',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '9999px',
+                          background: campaign.aiTrustScore >= 70 ? 'rgba(168, 213, 162, 0.15)' : campaign.aiTrustScore >= 40 ? 'rgba(255, 185, 85, 0.15)' : 'rgba(255, 100, 100, 0.15)',
+                          color: campaign.aiTrustScore >= 70 ? '#A8D5A2' : campaign.aiTrustScore >= 40 ? '#FFB955' : '#FF6464',
+                          fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: '0.875rem',
+                          fontWeight: 700
+                        }}>
+                          {campaign.aiTrustScore}/100
+                        </span>
+                      )}
+                    </div>
+                    {campaign.aiAnalysis && (
+                      <p className={styles.bodyText} style={{ whiteSpace: 'pre-wrap' }}>{campaign.aiAnalysis}</p>
+                    )}
+                    <p style={{
+                      fontSize: '0.6875rem',
+                      color: 'var(--sn-on-surface-variant, #E4BEB1)',
+                      opacity: 0.6,
+                      marginTop: '0.75rem',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Generated by Gemini 2.5 at campaign creation. Independent automated assessment.
+                    </p>
+                  </div>
+                ) : null}
 
                 {/* Milestones */}
                 {phases.length > 0 && (
@@ -594,9 +781,14 @@ export default function CampaignDetail({ user }) {
                                 <p className={styles.govAmount}>
                                   Req: {r.value} {r.isStablecoin ? "STABLE" : "ETH"} &middot; {r.approvalCount}/{chainData?.approversCount} Approvals
                                 </p>
-                                {user?.role === "donor" && aiAnalyses[r.index]?.report && (
-                                  <p className={styles.govAiHint}>
-                                    AI: {aiAnalyses[r.index].report.substring(0, 80)}...
+                                {aiAnalyses[r.index]?.loading && (
+                                  <p className={styles.govAiHint} style={{ opacity: 0.7 }}>
+                                    AI: analysing...
+                                  </p>
+                                )}
+                                {aiAnalyses[r.index]?.report && (
+                                  <p className={styles.govAiHint} title={aiAnalyses[r.index].report}>
+                                    AI {typeof aiAnalyses[r.index].score === 'number' ? `(${aiAnalyses[r.index].score}/100)` : ''}: {aiAnalyses[r.index].report.substring(0, 120)}{aiAnalyses[r.index].report.length > 120 ? '...' : ''}
                                   </p>
                                 )}
                               </div>
@@ -732,8 +924,8 @@ export default function CampaignDetail({ user }) {
                 <div className={styles.contentPanel}>
                   <div className={styles.metricsGrid}>
                     <div className={styles.metricBox}>
-                      <p className={styles.metricLabel}>ETH RAISED</p>
-                      <p className={styles.metricValue}>{chainData?.raisedAmount || "0"}</p>
+                      <p className={styles.metricLabel}>TOTAL RAISED</p>
+                      <p className={styles.metricValue}>{totalRaisedEquiv.toFixed(4)} ETH</p>
                     </div>
                     <div className={styles.metricBox}>
                       <p className={styles.metricLabel}>ETH TARGET</p>
@@ -780,10 +972,15 @@ export default function CampaignDetail({ user }) {
               {/* Amount Raised */}
               <div className={styles.raisedHeader}>
                 <div className={styles.raisedRow}>
-                  <span className={styles.raisedAmount}>{chainData?.raisedAmount || "0.00"}</span>
-                  <span className={styles.raisedCurrency}>USDC</span>
+                  <span className={styles.raisedAmount}>{totalRaisedEquiv.toFixed(4)}</span>
+                  <span className={styles.raisedCurrency}>ETH</span>
                 </div>
-                <div className={styles.goalText}>Raised of {chainData?.target || "0.00"} Goal</div>
+                <div className={styles.goalText}>Raised of {chainData?.target || "0.00"} ETH Goal</div>
+                {stableRaised > 0 && (
+                  <div className={styles.stableBreakdown}>
+                    {raisedEth.toFixed(4)} ETH + {stableRaised.toFixed(2)} mUSDT ({stableInEth.toFixed(4)} ETH)
+                  </div>
+                )}
               </div>
 
               {/* Progress Bar */}
@@ -813,13 +1010,17 @@ export default function CampaignDetail({ user }) {
               </div>
 
               {/* Back This Project / Donate */}
-              {user?.role === "donor" && !chainData?.cancelled && status?.key !== "expired" ? (
-                <Link to={`/donate/${id}`} style={{ textDecoration: "none" }}>
-                  <button className={styles.primaryActionBtn}>Back This Project</button>
-                </Link>
+              {user?.role === "donor" && !chainData?.cancelled && status?.key !== "expired" && status?.key !== "funded" && status?.key !== "completed" ? (
+                <button className={styles.primaryActionBtn} onClick={() => setDonateModal(true)}>
+                  Back This Project
+                </button>
               ) : (
                 <button className={styles.primaryActionBtn} disabled>
-                  {chainData?.cancelled ? "Cancelled" : status?.key === "expired" ? "Deadline Passed" : "Donation Unavailable"}
+                  {chainData?.cancelled ? "Cancelled"
+                    : status?.key === "expired" ? "Deadline Passed"
+                    : status?.key === "funded" ? "Goal Reached"
+                    : status?.key === "completed" ? "Campaign Completed"
+                    : "Donation Unavailable"}
                 </button>
               )}
 

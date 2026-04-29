@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { apiFetch, getContract, formatEth } from "../utils/ethereum";
+import { apiFetch, getContract, formatEth, formatTokenAmount } from "../utils/ethereum";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -31,17 +31,23 @@ export default function Analytics() {
   const [donationsOverTime, setDonationsOverTime] = useState([]);
   const [campaignsByCategory, setCampaignsByCategory] = useState([]);
   const [chainStats, setChainStats] = useState(null);
+  const [trends, setTrends] = useState(null);
+  const [geoData, setGeoData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); }, []);
 
   const loadAll = async () => {
     try {
-      const [statsData, timeData, catData] = await Promise.all([
+      const [statsData, timeData, catData, trendData, geo] = await Promise.all([
         apiFetch("/stats"),
         apiFetch("/analytics/donations-over-time"),
         apiFetch("/analytics/by-category"),
+        apiFetch("/analytics/trend-summary?days=30"),
+        apiFetch("/analytics/geo"),
       ]);
+      setTrends(trendData);
+      setGeoData(geo || []);
 
       setStats(statsData);
       setDonationsOverTime(timeData);
@@ -58,7 +64,7 @@ export default function Analytics() {
           setChainStats({
             totalCampaigns: Number(platform[0]),
             totalETH: formatEth(platform[1]),
-            totalStablecoin: formatEth(platform[2]),
+            totalStablecoin: formatTokenAmount(platform[2], 6),
             totalFinalized: Number(platform[3]),
             contractBalance: formatEth(platform[4]),
           });
@@ -96,6 +102,28 @@ export default function Analytics() {
   const valueLocked = chainStats ? `${chainStats.contractBalance} ETH` : "---";
   const impactProjects = chainStats ? chainStats.totalCampaigns : (stats?.totalCampaigns || 0);
 
+  // Real trend chip — hide when delta is null (no baseline) or current=0
+  const TrendChip = ({ trend }) => {
+    if (!trend) return null;
+    const { current, deltaPct } = trend;
+    if (deltaPct === null || deltaPct === undefined) {
+      return <div className={`${styles.metricTrend} ${styles.trendNeutral}`}><span>New</span></div>;
+    }
+    if (current === 0) {
+      return <div className={`${styles.metricTrend} ${styles.trendNeutral}`}><span>No activity 30d</span></div>;
+    }
+    const up = deltaPct >= 0;
+    const cls = `${styles.metricTrend} ${up ? styles.trendUp : ""}`;
+    return (
+      <div className={cls}>
+        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+          {up ? "trending_up" : "trending_down"}
+        </span>
+        <span>{up ? "+" : ""}{deltaPct}%</span>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
       {/* ── Page Header ── */}
@@ -115,19 +143,13 @@ export default function Analytics() {
           <p className={styles.metricValue}>
             {chainStats ? `${chainStats.totalETH} ETH` : totalDonationsCount}
           </p>
-          <div className={`${styles.metricTrend} ${styles.trendUp}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            <span>+14.2%</span>
-          </div>
+          <TrendChip trend={trends?.donationAmount} />
         </div>
         <div className={styles.metricCard}>
           <p className={styles.metricLabel}>Active Nodes</p>
           <span className={`material-symbols-outlined ${styles.metricIcon}`}>hub</span>
           <p className={styles.metricValue}>{activeNodes}</p>
-          <div className={`${styles.metricTrend} ${styles.trendUp}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            <span>+8.7%</span>
-          </div>
+          <TrendChip trend={trends?.users} />
         </div>
         <div className={styles.metricCard}>
           <p className={styles.metricLabel}>Value Locked</p>
@@ -141,10 +163,7 @@ export default function Analytics() {
           <p className={styles.metricLabel}>Impact Projects</p>
           <span className={`material-symbols-outlined ${styles.metricIcon}`}>eco</span>
           <p className={styles.metricValue}>{impactProjects}</p>
-          <div className={`${styles.metricTrend} ${styles.trendUp}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            <span>+5.3%</span>
-          </div>
+          <TrendChip trend={trends?.campaigns} />
         </div>
       </div>
 
@@ -346,6 +365,35 @@ export default function Analytics() {
           </div>
         </div>
       )}
+
+      {/* ── Geographic Distribution ── */}
+      <div className={styles.barSection}>
+        <div className={styles.chartPanel}>
+          <div className={styles.chartHeader}>
+            <span className={`material-symbols-outlined ${styles.chartIcon}`}>public</span>
+            <span className={styles.chartTitle}>Donor Geographic Distribution</span>
+          </div>
+          <p className={styles.chartDesc}>Auto-detected via ip-api.com on each donation. Shows where donors back campaigns from.</p>
+          {geoData.length === 0 ? (
+            <p style={{ padding: "1.5rem 0", color: "var(--sn-on-surface-variant, #E4BEB1)", opacity: 0.6, fontSize: "0.875rem" }}>
+              No country data yet. Will populate as donors contribute.
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={Math.max(160, geoData.length * 36)}>
+              <BarChart data={geoData} layout="vertical" margin={{ left: 70 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#5B4137" strokeOpacity={0.2} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: "#5B4137" }} axisLine={{ stroke: "#5B4137", strokeOpacity: 0.2 }} tickLine={false} allowDecimals={false} />
+                <YAxis type="category" dataKey="country" tick={{ fontSize: 11, fill: "#E4BEB1" }} axisLine={{ stroke: "#5B4137", strokeOpacity: 0.2 }} tickLine={false} width={110} />
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  formatter={(value, name) => [`${value} donation${value !== 1 ? "s" : ""}`, "Count"]}
+                />
+                <Bar dataKey="count" fill="#FFB59A" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
 
       {/* ── Research Context ── */}
       <div className={styles.researchPanel}>
