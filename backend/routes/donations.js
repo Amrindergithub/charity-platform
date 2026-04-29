@@ -4,6 +4,21 @@ const Donation = require('../models/Donation');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { safeParseInt, validateTxHash } = require('../middleware/validate');
 
+// Best-effort country detection via ip-api.com (no key required, limited to ~45 req/min from same IP)
+async function detectCountry(ip) {
+    try {
+        // ip-api requires public IP; localhost/private return "fail"
+        const cleanIp = (ip || '').replace('::ffff:', '');
+        const url = cleanIp && cleanIp !== '::1' && !cleanIp.startsWith('127.') && !cleanIp.startsWith('192.168.') && !cleanIp.startsWith('10.')
+            ? `http://ip-api.com/json/${cleanIp}?fields=country,countryCode,status`
+            : `http://ip-api.com/json/?fields=country,countryCode,status`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.status === 'success') return { country: data.country, countryCode: data.countryCode };
+    } catch (e) { /* silent */ }
+    return { country: null, countryCode: null };
+}
+
 router.post('/donations', requireAuth, requireRole('donor'), async (req, res) => {
     try {
         const { campaignId, donorWallet, amount, currency, txHash, donorName } = req.body;
@@ -14,11 +29,17 @@ router.post('/donations', requireAuth, requireRole('donor'), async (req, res) =>
             return res.status(400).json({ error: 'Valid donation amount required' });
         }
         const validCurrencies = ['ETH', 'USDT', 'USDC', 'DAI', 'mUSDT'];
+
+        // Auto-detect donor country from request IP
+        const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+        const { country, countryCode } = await detectCountry(ip);
+
         const newDonation = new Donation({
             campaignId, donorWallet: donorWallet ? donorWallet.toLowerCase() : req.user.walletAddress,
             amount: String(amount),
             currency: validCurrencies.includes(currency) ? currency : 'ETH',
-            txHash, donorName: donorName ? String(donorName).substring(0, 100) : undefined
+            txHash, donorName: donorName ? String(donorName).substring(0, 100) : undefined,
+            country, countryCode
         });
         await newDonation.save();
         res.status(201).json(newDonation);

@@ -31,6 +31,7 @@ app.use('/', require('./routes/upload'));
 app.use('/', require('./routes/ai'));
 app.use('/api', require('./routes/proxy'));
 app.use('/', require('./routes/analytics'));
+app.use('/', require('./routes/notifications'));
 
 // ── Global Error Handler (must be last) ──
 app.use(errorHandler);

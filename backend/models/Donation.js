@@ -7,6 +7,8 @@ const DonationSchema = new mongoose.Schema({
     currency: { type: String, enum: ['ETH', 'USDT', 'USDC', 'DAI', 'mUSDT'], default: 'ETH' },
     txHash: { type: String, required: true },
     donorName: String,
+    country: { type: String, default: null },
+    countryCode: { type: String, default: null },
     createdAt: { type: Date, default: Date.now }
 });
 
