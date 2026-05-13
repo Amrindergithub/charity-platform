@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ethers } from "ethers";
-import { getContract, getSigner, getContractAddr, apiFetch, apiPost, formatEth, formatTokenAmount, getEthUsdPrice, stablecoinToEth, getEthFiatRates, API_URL } from "../utils/ethereum";
+import { getContract, apiFetch, formatEth, formatTokenAmount, getEthUsdPrice, stablecoinToEth, getEthFiatRates, API_URL } from "../utils/ethereum";
 import { getCampaignStatus } from "../utils/campaignHelpers";
-import { useToast } from "../components/Toast";
 import { SkeletonCard } from "../components/Skeleton";
 import styles from "./Home.module.css";
 
 const CATEGORIES = ["All", "General", "Healthcare", "Education", "Environment", "Disaster Relief", "Poverty", "Animals"];
-
-// Minimal ERC-20 ABI for approve + decimals
-const IERC20_ABI = [
-  "function approve(address spender, uint256 amount) external returns (bool)",
-  "function decimals() external view returns (uint8)",
-  "function balanceOf(address account) external view returns (uint256)"
-];
 
 const STATUS_CLASS_MAP = {
   active: "statusActive",
@@ -25,12 +16,8 @@ const STATUS_CLASS_MAP = {
 };
 
 export default function Home({ user }) {
-  const toast = useToast();
   const [campaigns, setCampaigns] = useState([]);
   const [chainData, setChainData] = useState({});
-  const [donationAmounts, setDonationAmounts] = useState({});
-  const [donationCurrency] = useState({});
-  const [donatingId, setDonatingId] = useState(null); // eslint-disable-line no-unused-vars
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [platformStats, setPlatformStats] = useState(null);
@@ -105,71 +92,6 @@ export default function Home({ user }) {
       }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
-
-  // Fixed donate function with role check + stablecoin ERC-20 flow
-  const donate = async (campaign) => {
-    if (!user) return navigate("/login");
-    if (user.role !== "donor") return toast.error("Only donors can contribute");
-
-    const amount = donationAmounts[campaign._id];
-    const currency = donationCurrency[campaign._id] || "ETH";
-    if (!amount || parseFloat(amount) <= 0) return toast.warning("Enter a valid donation amount");
-
-    setDonatingId(campaign._id);
-    try {
-      const contract = await getContract();
-      let receipt;
-
-      if (currency === "ETH") {
-        const tx = await contract.donate(campaign.smartContractId, {
-          value: ethers.parseEther(amount),
-        });
-        receipt = await tx.wait();
-      } else {
-        // ERC-20 stablecoin flow: approve then donateStablecoin
-        const stablecoinAddr = await contract.stablecoinAddress();
-        if (stablecoinAddr === ethers.ZeroAddress) {
-          toast.error("Stablecoin not configured on this contract");
-          return;
-        }
-        const signer = await getSigner();
-        const tokenContract = new ethers.Contract(stablecoinAddr, IERC20_ABI, signer);
-
-        // Get decimals (USDT/USDC = 6, DAI = 18)
-        let decimals = 6;
-        try { decimals = Number(await tokenContract.decimals()); } catch { /* default 6 */ }
-        const parsedAmount = ethers.parseUnits(amount, decimals);
-
-        // Step 1: Approve contract to spend tokens
-        toast.info("Approving token spend...");
-        const contractAddress = getContractAddr();
-        const approveTx = await tokenContract.approve(contractAddress, parsedAmount);
-        await approveTx.wait();
-        toast.info("Approval confirmed. Sending donation...");
-
-        // Step 2: Call donateStablecoin on the charity contract
-        const tx = await contract.donateStablecoin(campaign.smartContractId, parsedAmount);
-        receipt = await tx.wait();
-      }
-
-      await apiPost("/donations", {
-        campaignId: campaign.smartContractId,
-        donorWallet: user.walletAddress.toLowerCase(),
-        amount: amount, currency: currency,
-        txHash: receipt.hash, donorName: user.fullName,
-      });
-
-      toast.success(`Donated ${amount} ${currency} successfully! You can now vote on spending.`);
-      setDonationAmounts({ ...donationAmounts, [campaign._id]: "" });
-      loadCampaigns();
-      loadPlatformStats();
-    } catch (err) {
-      console.error(err);
-      toast.error("Transaction failed: " + (err.reason || err.message));
-    } finally {
-      setDonatingId(null);
-    }
   };
 
   const filtered = campaigns.filter((c) => {

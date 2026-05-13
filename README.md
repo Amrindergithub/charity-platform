@@ -659,3 +659,46 @@ This platform was built as part of a dissertation investigating blockchain-based
 - **AI-Powered Features** — Gemini AI campaign generator and spending request advisor
 
 The platform directly addresses findings from the UK Charity Commission regarding transparency failures in the charitable sector, providing a technical solution that makes donation tracking trustless and verifiable.
+
+### Original Contributions (cited in §1.6)
+
+- **C1.** Open-source UK-focused donor-controlled charity dApp combining DAO governance, hybrid refund semantics and an LLM trust score in a single deployed artefact (chapter 4)
+- **C2.** Empirical hallucination-rate measurement of a Gemini 2.5 Flash trust-scoring oracle against twelve controlled charity descriptions (§5.3.6.1)
+- **C3.** Reusable adversarial Solidity test suite covering reentrancy, deadline and goal-bypass cases (§4.2.11)
+- **C4.** Reproducible per-operation gas profile on Sepolia, comparable against the published academic dApp literature (table 4.4 and §5.3.5)
+
+### Sepolia Deployment
+
+Both contracts are publicly verified on Sepolia Etherscan and Sourcify:
+
+- **CharityPlatform** — `0xaB2400f98e3168737506998B7A8d1e33b1Ed76c2`
+- **MockUSDT** — `0x0A410f00358Ce85C23e634d9516A9c0Ba0d917F1`
+
+Compiler: Solidity 0.8.28, optimisation enabled at 200 runs, Paris EVM target.
+
+### Test Suite (16 passing tests against local Ganache)
+
+- **11 happy-path tests** — `blockchain/test/charity_platform.test.js`: campaign creation (with/without phases, empty-name rejection), ether donations (minimum-contribution rejection), stablecoin donations (two-step approve/transferFrom), spending-request creation and auto-finalisation, manager-only cancellation guard, batch refunds, reputation tier returns
+- **5 adversarial tests** — `blockchain/test/adversarial.test.js`: re-entrancy via `MaliciousRefundReceiver.sol` malicious receive() hook, deadline bypass via evm_increaseTime, goal bypass after target reached, below-minimum donation rejection, raw ETH transfer rejection
+
+Run all 16: `npx truffle test`
+
+### Empirical AI Hallucination Study
+
+`Documentation/ai_hallucination_study.js` runs 21 controlled prompts against the Gemini 2.5 Flash trust-scoring oracle (10 plausible UK charity descriptions, 5 vague, 5 fraudulent, 1 prompt-injection attempt). 100% expected verdicts on the 12 reportable cases. Run:
+
+```bash
+GEMINI_API_KEY=... node Documentation/ai_hallucination_study.js
+```
+
+### Dissertation Build Pipeline
+
+`Documentation/build_skeleton.js` builds the full dissertation as a single docx-js document. Run:
+
+```bash
+cd Documentation && node build_skeleton.js
+```
+
+Output: `Documentation/TrustChain_Dissertation.docx` (~121 MB). User updates Word fields (TOC) before PDF export.
+
+Reference list: 62 entries, all live-verified via Crossref + arXiv + WebFetch + live Chrome navigation. All 161 in-text citations are parenthetical Harvard form, chronologically sorted within multi-cite blocks, with abbreviation expansion at first use for organisation names.

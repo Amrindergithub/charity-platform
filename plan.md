@@ -382,6 +382,67 @@
 
 ---
 
+## PHASE 13: Dissertation Final Audit, Verification and Submission Prep — COMPLETED
+
+### 13.1 Reference Verification (live Chrome + curl + Crossref + arXiv)
+- Verified every URL in 67-entry reference list via live Chrome navigation, falling back to curl + Crossref API + arXiv API for safety-blocked domains
+- Caught 22 hallucinated authors/DOIs/titles across 5 verification rounds; replaced each with Crossref-verified real papers
+- Notable corrections: Buterin → Daubenschütz/Anders (ERC-5192); Nishimura → Saito (Frontiers DOI); Ethereum Foundation 2022a/b → Cai/Zoltu; Zhang/Sun → Bhaumik/Yu; Patel IRJMETS → Seo et al. (2022, Webology); ethereum.org figure 99.95% → 99.99% (verified actual)
+- All 67 refs now traceable to live URLs or Crossref-registered DOIs
+- Removed 5 dead refs never cited in body (Brooke 1996 SUS, Civil Society News 2024, Meta Platforms 2024, Truffle Suite 2024, Nielsen 2000): final 62 refs
+
+### 13.2 Citation Format and Style (Harvard / Cite Them Right)
+- Converted all 13 narrative cites (e.g. `Sharma et al. (2023)`) to parenthetical Harvard form `(Sharma et al., 2023)`
+- Sorted all multi-cite parens blocks chronologically (oldest first)
+- Added abbreviation expansion at first use for orgs cited by short form: `Charities Aid Foundation [CAF]`, `National Council for Voluntary Organisations [NCVO]`, `World Wide Web Consortium [W3C]`, `Directory of Social Change [DSC]`, `Financial Conduct Authority [FCA]`, `Info-Tech Research Group [Info-Tech]`
+- Cross-referenced duplicate cite blocks: §3.4.2 → "datasets identified in section 3.2"; §3.6 → "regimes set out in section 2.11"
+- Final state: 62 refs, 161 cite occurrences, 0 dead, 0 narrative, 0 orphans, 100% reciprocal match
+
+### 13.3 Academic Phrasebook Style Pass
+- Applied Manchester Phrasebank passive-voice patterns across all chapters per supervisor guidance
+- Methodology rewritten throughout: "follows X" → "X was adopted"; "Two strands are used" → "Two strands were employed"; "Three risks are handled" → "Three risks were addressed"
+- Filler purged (really, simply, basically, actually → 0 occurrences)
+- Conversational connectives replaced (lets X → allows X; comes from → derives from; deal with → address; kicks off → initiates; matches → is consistent with)
+- First-person preserved only in Acknowledgements + objectives lists; Ch6 reflection rewritten passive
+
+### 13.4 Body Word-Count Trim (no quality loss)
+- Trimmed 13,319 → 12,461 body words (−6.4%) by removing verbosity and redundant restatement; every claim and citation preserved
+- 22 long paragraphs trimmed (largest: §3.6 Ethics 279w → 187w; §4.2.3 donateStablecoin 251w → 179w; §4.2.11 Phase 1 testing 234w → 167w)
+- Final landing: comfortable middle of UK BSc 12k-15k range
+
+### 13.5 Figure Caption Trim
+- Capped all 94 captions at ≤35 words (academic standard)
+- Most aggressive trims: Kanban 76w → 35w; DevTools 74w → 35w; Lighthouse comparative 67w → 40w
+- Distribution after trim: 39% under 15w, 32% in 16-25w, 29% in 26-35w, 0% over 35w
+
+### 13.6 Front Matter Restructure (matching supervisor template)
+- Removed List of Figures and List of Tables blocks (Lucian's dissertation pattern)
+- TOC `headingStyleRange: "1-3"` covers all H1-H3 headings — Update Field in Word populates automatically before PDF export
+
+### 13.7 Code Snippet → Screenshot Wiring
+- Replaced inline `code()` block at §4.2.11 with `shot('code_attack.png', ...)` for full MaliciousRefundReceiver.sol screenshot (Fig 4.40c)
+- Removed redundant Appendix D folder-tree code block (already shown in GitHub README screenshot Fig B.5)
+- Remaining inline code() blocks (Gemini system prompt §3.3.4, donate() function §4.2.3) retained as text — option to swap to screenshots later
+
+### 13.8 Adversarial Test Suite + Hallucination Study (empirical contributions)
+- **blockchain/contracts/MaliciousRefundReceiver.sol** — created test-only attacker contract for re-entrancy attack pattern
+- **blockchain/test/adversarial.test.js** — created 5-test adversarial suite covering re-entrancy, deadline bypass, goal bypass, below-minimum, raw-ETH transfers; all revert as expected
+- **Documentation/ai_hallucination_study.js** — created 21-prompt empirical study against Gemini 2.5 Flash with 13s throttle for free-tier quota; results saved to ai_hallucination_results.json
+- Both feed contributions C2 (hallucination measurement) and C3 (reusable adversarial test suite) cited in §1.6
+
+### 13.9 Tables Replaced with Terminal Screenshots (cleaner)
+- **Documentation/print_contracts_table.js** — ASCII printer for Table 4.1 (Sepolia contract addresses)
+- **Documentation/print_routes_table.js** — ASCII printer for Table 4.2 (Express route groups)
+- **Documentation/print_apis_table.js** — ASCII printer for Table 4.3 (six public APIs)
+- **Documentation/print_gas_table.js** — ASCII printer for Table 4.4 (per-operation gas)
+
+### 13.10 Build Pipeline
+- **Documentation/build_skeleton.js** — single-source dissertation builder (~1100 lines): docx-js with shot()/fig()/figcaption()/refEntry()/h1()/h2()/h3()/body()/code() helpers, multi-section page numbering (Roman front matter, Arabic body), automatic TOC/LoF/LoT, six chapters plus Appendices A-D
+- Output: `Documentation/TrustChain_Dissertation.docx` (~121 MB), submission-ready
+- User updates Word fields manually before PDF export
+
+---
+
 ## Files Changed Summary
 
 | File | Type | Key Changes |

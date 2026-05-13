@@ -465,10 +465,10 @@ export default function Dashboard({ user }) {
                       <span className={styles.aiResultTitle}>AI Analysis</span>
                       {aiResult.trustScore && (
                         <span className={`${styles.trustBadge} ${
-                          aiResult.trustScore >= 7 ? styles.trustHigh :
-                          aiResult.trustScore >= 4 ? styles.trustMedium : styles.trustLow
+                          aiResult.trustScore >= 70 ? styles.trustHigh :
+                          aiResult.trustScore >= 40 ? styles.trustMedium : styles.trustLow
                         }`}>
-                          Trust Score: {aiResult.trustScore}/10
+                          Trust Score: {aiResult.trustScore}/100
                         </span>
                       )}
                     </div>

@@ -34,7 +34,12 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true,
-      gas: 8000000
+      gas: 8000000,
+      verify: {
+        apiUrl: "https://api.etherscan.io/v2/api?chainid=11155111",
+        apiKey: process.env.ETHERSCAN_API_KEY,
+        explorerUrl: "https://sepolia.etherscan.io/address"
+      }
     }
   },
   compilers: {
@@ -52,5 +57,23 @@ module.exports = {
   },
   contracts_directory: "./blockchain/contracts/",
   contracts_build_directory: "./frontend/src/contracts/",
-  migrations_directory: "./blockchain/migrations/"
+  migrations_directory: "./blockchain/migrations/",
+  test_directory: "./blockchain/test/",
+  plugins: ["truffle-plugin-verify", "solidity-coverage"],
+  api_keys: {
+    etherscan: process.env.ETHERSCAN_API_KEY
+  },
+  mocha: {
+    reporter: "eth-gas-reporter",
+    reporterOptions: {
+      currency: "USD",
+      gasPrice: 2.5,
+      showTimeSpent: true,
+      src: "blockchain/contracts",
+      artifactType: "truffle-v5",
+      excludeContracts: ["Migrations"],
+      forceConsoleOutput: true,
+      noColors: false
+    }
+  }
 };

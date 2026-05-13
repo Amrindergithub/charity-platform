@@ -1,0 +1,1474 @@
+{
+  "contractName": "MaliciousRefundReceiver",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_target",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "attackEnabled",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "campaignId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reentryAttempts",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reentryReverts",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "target",
+      "outputs": [
+        {
+          "internalType": "contract ICharityPlatform",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "setCampaign",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "arm",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "disarm",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "donateAs",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "attack",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.28+commit.7893614a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"arm\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"attack\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"attackEnabled\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"campaignId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"disarm\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"donateAs\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reentryAttempts\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reentryReverts\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"setCampaign\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"target\",\"outputs\":[{\"internalType\":\"contract ICharityPlatform\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"MaliciousRefundReceiver\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"attack()\":{\"notice\":\"Trigger the legitimate refund claim. The follow-up         re-entrancy attempt happens inside receive().\"},\"donateAs(uint256)\":{\"notice\":\"Donate from this contract so it shows up as a donor.\"}},\"notice\":\"Test-only contract that attempts a re-entrancy attack against         CharityPlatform.claimRefund. The receive() function calls         claimRefund a second time during the first refund's transfer.         If the ReentrancyGuard is correctly applied, the second call         must revert with \\\"Reentrant call\\\".         This contract is used only by the adversarial Truffle tests in         blockchain/test/adversarial.test.js and is NOT deployed to any         public network.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/blockchain/contracts/MaliciousRefundReceiver.sol\":\"MaliciousRefundReceiver\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"project:/blockchain/contracts/MaliciousRefundReceiver.sol\":{\"keccak256\":\"0xa3c2a548a65e73d64c7736bb2061f07fe3ec723b368fae072412faf5ec0cd10d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6e9a996eeb0e6818ee62589085fa163b10df55dc5a73f7cbe69c487ee7053b4e\",\"dweb:/ipfs/QmenR4ooukhadEiF3eHqErZd6ENShTk9cV3uM2L7fDK5ib\"]}},\"version\":1}",
+  "bytecode": "0x608034607057601f61042838819003918201601f19168301916001600160401b03831184841017607557808492602094604052833981010312607057516001600160a01b03811690819003607057600080546001600160a01b03191691909117905560405161039c908161008c8239f35b600080fd5b634e487b7160e01b600052604160045260246000fdfe6080806040526004361015610025575b50361561001b57600080fd5b6100236102b3565b005b600090813560e01c9081632830b29f1461026057816331e15aad146101f657508063370419e5146101d557806383985082146101b75780638ed5b0fc14610199578063951130041461017b5780639e5faafc14610106578063a8745cd2146100e8578063d4b83992146100c15763d7751b850361000f57346100be57806003193601126100be57602060ff600454166040519015158152f35b80fd5b50346100be57806003193601126100be57546040516001600160a01b039091168152602090f35b50346100be57806003193601126100be576020600154604051908152f35b50346100be57806003193601126100be57805460035482916001600160a01b031690813b156101775782916024839260405194859384926316deebd960e21b845260048401525af1801561016c5761015b5750f35b816101659161027b565b6100be5780f35b6040513d84823e3d90fd5b5050fd5b50346100be57806003193601126100be576020600254604051908152f35b50346100be57806003193601126100be576020600354604051908152f35b50346100be57806003193601126100be5760ff196004541660045580f35b50346100be57806003193601126100be57600160ff19600454161760045580f35b9050602036600319011261025c57815482906001600160a01b0316803b1561025c5782602481849363f14faf6f60e01b8252600435600483015234905af1801561024f576102415780f35b61024a9161027b565b388180f35b50604051903d90823e3d90fd5b5080fd5b82346100be5760203660031901126100be5760043560035580f35b90601f8019910116810190811067ffffffffffffffff82111761029d57604052565b634e487b7160e01b600052604160045260246000fd5b60045460ff600091161561033b57600154600181018091116103525760015560018060a01b03815416600354813b1561034e5782916024839260405195869384926316deebd960e21b845260048401525af1918261033e575b509061033b5760025490600182018092116103275750600255565b634e487b7160e01b81526011600452602490fd5b50565b816103489161027b565b3861030c565b8280fd5b634e487b7160e01b82526011600452602482fdfea2646970667358221220c53bde2783eebb850ca656273f525819a314e07a8a217ddc4dde2a8aea78ec7d64736f6c634300081c0033",
+  "deployedBytecode": "0x6080806040526004361015610025575b50361561001b57600080fd5b6100236102b3565b005b600090813560e01c9081632830b29f1461026057816331e15aad146101f657508063370419e5146101d557806383985082146101b75780638ed5b0fc14610199578063951130041461017b5780639e5faafc14610106578063a8745cd2146100e8578063d4b83992146100c15763d7751b850361000f57346100be57806003193601126100be57602060ff600454166040519015158152f35b80fd5b50346100be57806003193601126100be57546040516001600160a01b039091168152602090f35b50346100be57806003193601126100be576020600154604051908152f35b50346100be57806003193601126100be57805460035482916001600160a01b031690813b156101775782916024839260405194859384926316deebd960e21b845260048401525af1801561016c5761015b5750f35b816101659161027b565b6100be5780f35b6040513d84823e3d90fd5b5050fd5b50346100be57806003193601126100be576020600254604051908152f35b50346100be57806003193601126100be576020600354604051908152f35b50346100be57806003193601126100be5760ff196004541660045580f35b50346100be57806003193601126100be57600160ff19600454161760045580f35b9050602036600319011261025c57815482906001600160a01b0316803b1561025c5782602481849363f14faf6f60e01b8252600435600483015234905af1801561024f576102415780f35b61024a9161027b565b388180f35b50604051903d90823e3d90fd5b5080fd5b82346100be5760203660031901126100be5760043560035580f35b90601f8019910116810190811067ffffffffffffffff82111761029d57604052565b634e487b7160e01b600052604160045260246000fd5b60045460ff600091161561033b57600154600181018091116103525760015560018060a01b03815416600354813b1561034e5782916024839260405195869384926316deebd960e21b845260048401525af1918261033e575b509061033b5760025490600182018092116103275750600255565b634e487b7160e01b81526011600452602490fd5b50565b816103489161027b565b3861030c565b8280fd5b634e487b7160e01b82526011600452602482fdfea2646970667358221220c53bde2783eebb850ca656273f525819a314e07a8a217ddc4dde2a8aea78ec7d64736f6c634300081c0033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "752:1225:0:-:0;;;;;;;;;;;;;-1:-1:-1;;752:1225:0;;;;-1:-1:-1;;;;;752:1225:0;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;752:1225:0;;;;;;;;-1:-1:-1;752:1225:0;;-1:-1:-1;;;;;;752:1225:0;;;;;;;;;;;;;;;;;-1:-1:-1;752:1225:0;;;;;;-1:-1:-1;752:1225:0;;;;;-1:-1:-1;752:1225:0",
+  "deployedSourceMap": "752:1225:0:-:0;;;;;;;;;;-1:-1:-1;752:1225:0;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;752:1225:0;;;;;;;;;;;;;;;;;;;;;;827:30;752:1225;;;;;;;;;;;;;;;;;;;;;;1628:10;752:1225;;;-1:-1:-1;;;;;752:1225:0;;1609:30;;;;;752:1225;;1609:30;752:1225;;;;;;;;;;;;1609:30;;752:1225;1609:30;;752:1225;1609:30;;;;;;;;752:1225;;1609:30;;;;;:::i;:::-;752:1225;;1609:30;752:1225;1609:30;752:1225;;;;;;;;;1609:30;752:1225;;;;;;;;;;;;;;;;;863:29;752:1225;;;;;;;;;;;;;;;;;;;;;898:25;752:1225;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1179:4;752:1225;;;;;;;;;;;;-1:-1:-1;752:1225:0;;-1:-1:-1;;752:1225:0;;;;;;;;-1:-1:-1;;;;;752:1225:0;1394:36;;;;;752:1225;1394:36;752:1225;;;;;;1394:36;;752:1225;;;1394:36;;752:1225;1415:9;1394:36;;;;;;;;;752:1225;;1394:36;;;;:::i;:::-;;;752:1225;;1394:36;752:1225;;;;;;;;;;;1394:36;752:1225;;;;;;;;;;-1:-1:-1;;752:1225:0;;;;;;1100:16;752:1225;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;-1:-1:-1;752:1225:0;;;;;-1:-1:-1;752:1225:0;1652:323;1694:13;752:1225;;-1:-1:-1;752:1225:0;;1693:14;1689:27;;1744:1;752:1225;1744:1;752:1225;;;;;;;1744:1;752:1225;;;;;;;;;1853:10;752:1225;1834:30;;;;;752:1225;;1834:30;752:1225;;;;;;;;;;;;1834:30;;1694:13;1834:30;;752:1225;1834:30;;;;;;1652:323;-1:-1:-1;1830:139:0;;;1939:19;752:1225;;1744:1;752:1225;;;;;;;;1939:19;752:1225;1652:323::o;752:1225::-;-1:-1:-1;;;752:1225:0;;;1694:13;752:1225;1834:30;;752:1225;1830:139;;1652:323::o;1834:30::-;;;;;:::i;:::-;;;;;752:1225;;;;-1:-1:-1;;;752:1225:0;;;1694:13;752:1225;;;",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\ninterface ICharityPlatform {\n    function donate(uint _campaignId) external payable;\n    function claimRefund(uint _campaignId) external;\n}\n\n/**\n * @title MaliciousRefundReceiver\n * @notice Test-only contract that attempts a re-entrancy attack against\n *         CharityPlatform.claimRefund. The receive() function calls\n *         claimRefund a second time during the first refund's transfer.\n *         If the ReentrancyGuard is correctly applied, the second call\n *         must revert with \"Reentrant call\".\n *\n *         This contract is used only by the adversarial Truffle tests in\n *         blockchain/test/adversarial.test.js and is NOT deployed to any\n *         public network.\n */\ncontract MaliciousRefundReceiver {\n    ICharityPlatform public target;\n    uint256 public reentryAttempts;\n    uint256 public reentryReverts;\n    uint256 public campaignId;\n    bool public attackEnabled;\n\n    constructor(address _target) {\n        target = ICharityPlatform(_target);\n    }\n\n    function setCampaign(uint256 _id) external {\n        campaignId = _id;\n    }\n\n    function arm() external {\n        attackEnabled = true;\n    }\n\n    function disarm() external {\n        attackEnabled = false;\n    }\n\n    /// @notice Donate from this contract so it shows up as a donor.\n    function donateAs(uint256 _id) external payable {\n        target.donate{value: msg.value}(_id);\n    }\n\n    /// @notice Trigger the legitimate refund claim. The follow-up\n    ///         re-entrancy attempt happens inside receive().\n    function attack() external {\n        target.claimRefund(campaignId);\n    }\n\n    receive() external payable {\n        if (!attackEnabled) return;\n        reentryAttempts += 1;\n        // Try to re-enter claimRefund. Must revert under ReentrancyGuard.\n        try target.claimRefund(campaignId) {\n            // unreachable if guard works\n        } catch {\n            reentryReverts += 1;\n        }\n    }\n}\n",
+  "sourcePath": "/Users/amrinder/Downloads/claude/charity-platform/blockchain/contracts/MaliciousRefundReceiver.sol",
+  "ast": {
+    "absolutePath": "project:/blockchain/contracts/MaliciousRefundReceiver.sol",
+    "exportedSymbols": {
+      "ICharityPlatform": [
+        12
+      ],
+      "MaliciousRefundReceiver": [
+        115
+      ]
+    },
+    "id": 116,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".28"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:0"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ICharityPlatform",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 12,
+        "linearizedBaseContracts": [
+          12
+        ],
+        "name": "ICharityPlatform",
+        "nameLocation": "68:16:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "f14faf6f",
+            "id": 6,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "donate",
+            "nameLocation": "100:6:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 4,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3,
+                  "mutability": "mutable",
+                  "name": "_campaignId",
+                  "nameLocation": "112:11:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6,
+                  "src": "107:16:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "107:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "106:18:0"
+            },
+            "returnParameters": {
+              "id": 5,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "141:0:0"
+            },
+            "scope": 12,
+            "src": "91:51:0",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5b7baf64",
+            "id": 11,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "claimRefund",
+            "nameLocation": "156:11:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8,
+                  "mutability": "mutable",
+                  "name": "_campaignId",
+                  "nameLocation": "173:11:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11,
+                  "src": "168:16:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "168:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "167:18:0"
+            },
+            "returnParameters": {
+              "id": 10,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "194:0:0"
+            },
+            "scope": 12,
+            "src": "147:48:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 116,
+        "src": "58:139:0",
+        "usedErrors": [],
+        "usedEvents": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "MaliciousRefundReceiver",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 13,
+          "nodeType": "StructuredDocumentation",
+          "src": "199:552:0",
+          "text": " @title MaliciousRefundReceiver\n @notice Test-only contract that attempts a re-entrancy attack against\n         CharityPlatform.claimRefund. The receive() function calls\n         claimRefund a second time during the first refund's transfer.\n         If the ReentrancyGuard is correctly applied, the second call\n         must revert with \"Reentrant call\".\n         This contract is used only by the adversarial Truffle tests in\n         blockchain/test/adversarial.test.js and is NOT deployed to any\n         public network."
+        },
+        "fullyImplemented": true,
+        "id": 115,
+        "linearizedBaseContracts": [
+          115
+        ],
+        "name": "MaliciousRefundReceiver",
+        "nameLocation": "761:23:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "d4b83992",
+            "id": 16,
+            "mutability": "mutable",
+            "name": "target",
+            "nameLocation": "815:6:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 115,
+            "src": "791:30:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+              "typeString": "contract ICharityPlatform"
+            },
+            "typeName": {
+              "id": 15,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 14,
+                "name": "ICharityPlatform",
+                "nameLocations": [
+                  "791:16:0"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 12,
+                "src": "791:16:0"
+              },
+              "referencedDeclaration": 12,
+              "src": "791:16:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                "typeString": "contract ICharityPlatform"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "a8745cd2",
+            "id": 18,
+            "mutability": "mutable",
+            "name": "reentryAttempts",
+            "nameLocation": "842:15:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 115,
+            "src": "827:30:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 17,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "827:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "95113004",
+            "id": 20,
+            "mutability": "mutable",
+            "name": "reentryReverts",
+            "nameLocation": "878:14:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 115,
+            "src": "863:29:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 19,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "863:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "8ed5b0fc",
+            "id": 22,
+            "mutability": "mutable",
+            "name": "campaignId",
+            "nameLocation": "913:10:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 115,
+            "src": "898:25:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "898:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "d7751b85",
+            "id": 24,
+            "mutability": "mutable",
+            "name": "attackEnabled",
+            "nameLocation": "941:13:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 115,
+            "src": "929:25:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 23,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "929:4:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 35,
+              "nodeType": "Block",
+              "src": "990:51:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 33,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 29,
+                      "name": "target",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16,
+                      "src": "1000:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                        "typeString": "contract ICharityPlatform"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "id": 31,
+                          "name": "_target",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 26,
+                          "src": "1026:7:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 30,
+                        "name": "ICharityPlatform",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 12,
+                        "src": "1009:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_ICharityPlatform_$12_$",
+                          "typeString": "type(contract ICharityPlatform)"
+                        }
+                      },
+                      "id": 32,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1009:25:0",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                        "typeString": "contract ICharityPlatform"
+                      }
+                    },
+                    "src": "1000:34:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                      "typeString": "contract ICharityPlatform"
+                    }
+                  },
+                  "id": 34,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1000:34:0"
+                }
+              ]
+            },
+            "id": 36,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 27,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 26,
+                  "mutability": "mutable",
+                  "name": "_target",
+                  "nameLocation": "981:7:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 36,
+                  "src": "973:15:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 25,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "973:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "972:17:0"
+            },
+            "returnParameters": {
+              "id": 28,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "990:0:0"
+            },
+            "scope": 115,
+            "src": "961:80:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 45,
+              "nodeType": "Block",
+              "src": "1090:33:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 43,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 41,
+                      "name": "campaignId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 22,
+                      "src": "1100:10:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 42,
+                      "name": "_id",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 38,
+                      "src": "1113:3:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1100:16:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 44,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1100:16:0"
+                }
+              ]
+            },
+            "functionSelector": "2830b29f",
+            "id": 46,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setCampaign",
+            "nameLocation": "1056:11:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 39,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 38,
+                  "mutability": "mutable",
+                  "name": "_id",
+                  "nameLocation": "1076:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 46,
+                  "src": "1068:11:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 37,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1068:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1067:13:0"
+            },
+            "returnParameters": {
+              "id": 40,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1090:0:0"
+            },
+            "scope": 115,
+            "src": "1047:76:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 53,
+              "nodeType": "Block",
+              "src": "1153:37:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 51,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 49,
+                      "name": "attackEnabled",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 24,
+                      "src": "1163:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "74727565",
+                      "id": 50,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1179:4:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "true"
+                    },
+                    "src": "1163:20:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 52,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1163:20:0"
+                }
+              ]
+            },
+            "functionSelector": "370419e5",
+            "id": 54,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "arm",
+            "nameLocation": "1138:3:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 47,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1141:2:0"
+            },
+            "returnParameters": {
+              "id": 48,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1153:0:0"
+            },
+            "scope": 115,
+            "src": "1129:61:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 61,
+              "nodeType": "Block",
+              "src": "1223:38:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 59,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 57,
+                      "name": "attackEnabled",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 24,
+                      "src": "1233:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "66616c7365",
+                      "id": 58,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1249:5:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "false"
+                    },
+                    "src": "1233:21:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 60,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1233:21:0"
+                }
+              ]
+            },
+            "functionSelector": "83985082",
+            "id": 62,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "disarm",
+            "nameLocation": "1205:6:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 55,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1211:2:0"
+            },
+            "returnParameters": {
+              "id": 56,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1223:0:0"
+            },
+            "scope": 115,
+            "src": "1196:65:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 77,
+              "nodeType": "Block",
+              "src": "1384:53:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 74,
+                        "name": "_id",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 65,
+                        "src": "1426:3:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "expression": {
+                          "id": 68,
+                          "name": "target",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 16,
+                          "src": "1394:6:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                            "typeString": "contract ICharityPlatform"
+                          }
+                        },
+                        "id": 70,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1401:6:0",
+                        "memberName": "donate",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 6,
+                        "src": "1394:13:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_external_payable$_t_uint256_$returns$__$",
+                          "typeString": "function (uint256) payable external"
+                        }
+                      },
+                      "id": 73,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "names": [
+                        "value"
+                      ],
+                      "nodeType": "FunctionCallOptions",
+                      "options": [
+                        {
+                          "expression": {
+                            "id": 71,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967281,
+                            "src": "1415:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 72,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "1419:5:0",
+                          "memberName": "value",
+                          "nodeType": "MemberAccess",
+                          "src": "1415:9:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "src": "1394:31:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_payable$_t_uint256_$returns$__$value",
+                        "typeString": "function (uint256) payable external"
+                      }
+                    },
+                    "id": 75,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1394:36:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 76,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1394:36:0"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 63,
+              "nodeType": "StructuredDocumentation",
+              "src": "1267:64:0",
+              "text": "@notice Donate from this contract so it shows up as a donor."
+            },
+            "functionSelector": "31e15aad",
+            "id": 78,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "donateAs",
+            "nameLocation": "1345:8:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 66,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 65,
+                  "mutability": "mutable",
+                  "name": "_id",
+                  "nameLocation": "1362:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 78,
+                  "src": "1354:11:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 64,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1354:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1353:13:0"
+            },
+            "returnParameters": {
+              "id": 67,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1384:0:0"
+            },
+            "scope": 115,
+            "src": "1336:101:0",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 88,
+              "nodeType": "Block",
+              "src": "1599:47:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 85,
+                        "name": "campaignId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 22,
+                        "src": "1628:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "id": 82,
+                        "name": "target",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 16,
+                        "src": "1609:6:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                          "typeString": "contract ICharityPlatform"
+                        }
+                      },
+                      "id": 84,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1616:11:0",
+                      "memberName": "claimRefund",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11,
+                      "src": "1609:18:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
+                        "typeString": "function (uint256) external"
+                      }
+                    },
+                    "id": 86,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1609:30:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 87,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1609:30:0"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 79,
+              "nodeType": "StructuredDocumentation",
+              "src": "1443:124:0",
+              "text": "@notice Trigger the legitimate refund claim. The follow-up\n         re-entrancy attempt happens inside receive()."
+            },
+            "functionSelector": "9e5faafc",
+            "id": 89,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "attack",
+            "nameLocation": "1581:6:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 80,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1587:2:0"
+            },
+            "returnParameters": {
+              "id": 81,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1599:0:0"
+            },
+            "scope": 115,
+            "src": "1572:74:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 113,
+              "nodeType": "Block",
+              "src": "1679:296:0",
+              "statements": [
+                {
+                  "condition": {
+                    "id": 93,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "!",
+                    "prefix": true,
+                    "src": "1693:14:0",
+                    "subExpression": {
+                      "id": 92,
+                      "name": "attackEnabled",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 24,
+                      "src": "1694:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 95,
+                  "nodeType": "IfStatement",
+                  "src": "1689:27:0",
+                  "trueBody": {
+                    "functionReturnParameters": 91,
+                    "id": 94,
+                    "nodeType": "Return",
+                    "src": "1709:7:0"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 98,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 96,
+                      "name": "reentryAttempts",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 18,
+                      "src": "1725:15:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 97,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1744:1:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1725:20:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 99,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1725:20:0"
+                },
+                {
+                  "clauses": [
+                    {
+                      "block": {
+                        "id": 104,
+                        "nodeType": "Block",
+                        "src": "1865:53:0",
+                        "statements": []
+                      },
+                      "errorName": "",
+                      "id": 105,
+                      "nodeType": "TryCatchClause",
+                      "src": "1865:53:0"
+                    },
+                    {
+                      "block": {
+                        "id": 110,
+                        "nodeType": "Block",
+                        "src": "1925:44:0",
+                        "statements": [
+                          {
+                            "expression": {
+                              "id": 108,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftHandSide": {
+                                "id": 106,
+                                "name": "reentryReverts",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 20,
+                                "src": "1939:14:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "Assignment",
+                              "operator": "+=",
+                              "rightHandSide": {
+                                "hexValue": "31",
+                                "id": 107,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "number",
+                                "lValueRequested": false,
+                                "nodeType": "Literal",
+                                "src": "1957:1:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_rational_1_by_1",
+                                  "typeString": "int_const 1"
+                                },
+                                "value": "1"
+                              },
+                              "src": "1939:19:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "id": 109,
+                            "nodeType": "ExpressionStatement",
+                            "src": "1939:19:0"
+                          }
+                        ]
+                      },
+                      "errorName": "",
+                      "id": 111,
+                      "nodeType": "TryCatchClause",
+                      "src": "1919:50:0"
+                    }
+                  ],
+                  "externalCall": {
+                    "arguments": [
+                      {
+                        "id": 102,
+                        "name": "campaignId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 22,
+                        "src": "1853:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "id": 100,
+                        "name": "target",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 16,
+                        "src": "1834:6:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ICharityPlatform_$12",
+                          "typeString": "contract ICharityPlatform"
+                        }
+                      },
+                      "id": 101,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1841:11:0",
+                      "memberName": "claimRefund",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11,
+                      "src": "1834:18:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
+                        "typeString": "function (uint256) external"
+                      }
+                    },
+                    "id": 103,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1834:30:0",
+                    "tryCall": true,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 112,
+                  "nodeType": "TryStatement",
+                  "src": "1830:139:0"
+                }
+              ]
+            },
+            "id": 114,
+            "implemented": true,
+            "kind": "receive",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 90,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1659:2:0"
+            },
+            "returnParameters": {
+              "id": 91,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1679:0:0"
+            },
+            "scope": 115,
+            "src": "1652:323:0",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 116,
+        "src": "752:1225:0",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:1946:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.28+commit.7893614a.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.16",
+  "updatedAt": "2026-05-07T11:13:08.600Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "title": "MaliciousRefundReceiver",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "attack()": {
+        "notice": "Trigger the legitimate refund claim. The follow-up         re-entrancy attempt happens inside receive()."
+      },
+      "donateAs(uint256)": {
+        "notice": "Donate from this contract so it shows up as a donor."
+      }
+    },
+    "notice": "Test-only contract that attempts a re-entrancy attack against         CharityPlatform.claimRefund. The receive() function calls         claimRefund a second time during the first refund's transfer.         If the ReentrancyGuard is correctly applied, the second call         must revert with \"Reentrant call\".         This contract is used only by the adversarial Truffle tests in         blockchain/test/adversarial.test.js and is NOT deployed to any         public network.",
+    "version": 1
+  }
+}

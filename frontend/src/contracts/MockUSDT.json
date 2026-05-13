@@ -3765,12 +3765,12 @@
     "11155111": {
       "events": {},
       "links": {},
-      "address": "0x584e05073D4507c7493dc946Da817b1EeD910EA9",
-      "transactionHash": "0x6c84a421ca534f4cd02889f25851bdfbede527f22b8a5cf376da2bd5efb14d85"
+      "address": "0x0A410f00358Ce85C23e634d9516A9c0Ba0d917F1",
+      "transactionHash": "0x542425cadec642ad35ce51c83780621f86c4583298dfef4cb672319c41206ada"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2026-04-29T22:51:13.926Z",
+  "updatedAt": "2026-05-05T20:24:25.102Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "6 decimals (same as real USDT). Includes an open faucet so any      address can mint test tokens. DO NOT deploy to mainnet.      Usage with TrustChain:        1. Deploy MockUSDT        2. Call CharityPlatform.setStablecoinAddress(mockUSDT.address)        3. Donors call mockUSDT.faucet(myAddress, 1000e6) to get 1000 mUSDT        4. Donors call mockUSDT.approve(charityPlatform.address, amount)        5. Donors call charityPlatform.donateStablecoin(campaignId, amount)",

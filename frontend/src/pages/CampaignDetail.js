@@ -1031,9 +1031,9 @@ export default function CampaignDetail({ user }) {
               </div>
 
               {/* Manager Controls / Refund Controls */}
-              {(isManager || (isDonor && chainData?.cancelled)) && (
+              {((isManager && user?.role === "charity") || (isDonor && chainData?.cancelled)) && (
                 <div className={styles.managerControlsWrapper}>
-                  {isManager && !chainData?.cancelled && status?.key !== "cancelled" && (
+                  {isManager && user?.role === "charity" && !chainData?.cancelled && status?.key !== "cancelled" && (
                     <button className={styles.managerControlBtn} onClick={() => setCancelModal(true)} disabled={actionLoading === "cancel"}>
                       {actionLoading === "cancel" ? "STOPPING..." : "CANCEL CAMPAIGN"}
                     </button>
@@ -1043,7 +1043,7 @@ export default function CampaignDetail({ user }) {
                       CLAIM REFUND
                     </button>
                   )}
-                  {chainData?.cancelled && isManager && refundProgress.total > 0 && refundProgress.refunded < refundProgress.total && (
+                  {chainData?.cancelled && isManager && user?.role === "charity" && refundProgress.total > 0 && refundProgress.refunded < refundProgress.total && (
                     <button className={`${styles.managerControlBtn} ${styles.safe}`} onClick={continueRefunds} disabled={actionLoading === "continue-refunds"}>
                       PROCESS BATCH REFUNDS
                     </button>
